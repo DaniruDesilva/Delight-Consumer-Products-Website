@@ -1,0 +1,291 @@
+/* Fonts are self-hosted via next/font/google in layout.tsx — no external request needed.
+   CSS variables --font-heading and --font-body are injected by next/font. */
+
+:root {
+  /* ─── Premium Color Palette ─── */
+  --bg-base: #FAF8F5;
+  --bg-surface: #F5F2ED;
+  --bg-elevated: #FFFFFF;
+
+  --primary-green: #3A6B4C;
+  --primary-green-light: #4A7D5E;
+  --primary-green-dark: #2D5A3F;
+  --secondary-green: #2D5A3F;
+
+  --primary-brown: #3D2B1F;
+  --accent-gold: #C8A96E;
+  --accent-tan: #c29255;
+  --light-tan: #F5F2ED;
+
+  --white: #FFFFFF;
+  --text-main: #2A1F1A;
+  --text-body: #5A4A42;
+  --text-muted: #8A7B73;
+  --text-light: #A89B93;
+
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-light: rgba(0, 0, 0, 0.04);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
+
+  /* ─── Typography ─── */
+  --font-heading: 'Playfair Display', 'Georgia', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* ─── Spacing ─── */
+  --section-padding: 120px 20px;
+  --container-max: 1300px;
+
+  /* ─── Transitions ─── */
+  --ease-out: cubic-bezier(0.25, 0.4, 0.25, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+  background-color: var(--bg-base);
+  color: var(--text-body);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  color: var(--primary-brown);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+h1 { font-size: clamp(40px, 5vw, 72px); }
+h2 { font-size: clamp(30px, 3.5vw, 48px); }
+h3 { font-size: clamp(20px, 2vw, 28px); }
+
+p {
+  color: var(--text-body);
+  line-height: 1.8;
+}
+
+img {
+  max-width: 100%;
+}
+
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Global Button Styles ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out);
+  border: none;
+  letter-spacing: 0.03em;
+  font-family: var(--font-body);
+}
+
+.btn-primary {
+  background-color: var(--primary-green);
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(58, 107, 76, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-green-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(58, 107, 76, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--primary-green);
+  color: var(--primary-green);
+}
+
+.btn-outline:hover {
+  background: var(--primary-green);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(58, 107, 76, 0.25);
+}
+
+/* ─── Selection Color ─── */
+::selection {
+  background: rgba(58, 107, 76, 0.15);
+  color: var(--primary-brown);
+}
+
+/* ═══════════════════════════════════════════
+   GLOBAL RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  :root {
+    --section-padding: 80px 20px;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    font-size: 13px;
+  }
+
+  html, body {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-padding: 60px 16px;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 12px;
+  }
+
+  html, body {
+    font-size: 14px;
+  }
+}
+
+/* ─── Skeleton Loader Animation ─── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Shimmer Animation (for CTA buttons, highlights) ─── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Subtle Glow Pulse ─── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(58, 107, 76, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(58, 107, 76, 0.12); }
+}
+
+/* ─── Section Divider — Elegant ornamental break ─── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 200px;
+  gap: 16px;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+}
+
+.section-divider-diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--primary-green);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+/* ─── Custom Cursor ─── */
+@media (hover: hover) and (pointer: fine) {
+  body, a, button, input, textarea, select, [role="button"] {
+    cursor: none;
+  }
+}
+
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--primary-green);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate3d(-50%, -50%, 0); /* Center exactly on pointer */
+  margin-left: -4px;
+  margin-top: -4px;
+  transition: opacity 0.3s ease, transform 0.1s linear;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(58, 107, 76, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate3d(-50%, -50%, 0);
+  margin-left: -20px;
+  margin-top: -20px;
+  transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  will-change: transform, width, height;
+}
+
+/* Hover state for clickable elements */
+.custom-cursor-ring.cursor-hover {
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  background: rgba(58, 107, 76, 0.05);
+  border-color: rgba(58, 107, 76, 0.2);
+  backdrop-filter: blur(2px);
+}
+

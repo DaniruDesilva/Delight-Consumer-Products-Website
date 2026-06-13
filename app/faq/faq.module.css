@@ -1,0 +1,125 @@
+.faqPage {
+  padding-top: 160px;
+  min-height: 100vh;
+  background-color: var(--bg-base);
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 5vw, 64px);
+  color: var(--primary-brown);
+  margin-bottom: 16px;
+}
+
+.hero p {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faqContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 120px;
+}
+
+.categorySection {
+  margin-bottom: 60px;
+}
+
+.categorySection h2 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--primary-green);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-out);
+}
+
+.item:hover {
+  border-color: var(--primary-green-light);
+  box-shadow: var(--shadow-md);
+}
+
+.question {
+  width: 100%;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.question h3 {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.icon {
+  color: var(--primary-green);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.itemOpen .icon {
+  transform: rotate(180deg);
+}
+
+.answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: rgba(58, 107, 76, 0.02);
+}
+
+.itemOpen .answer {
+  max-height: 500px; /* Adjust as needed */
+}
+
+.answerInner {
+  padding: 0 24px 24px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+@media (max-width: 768px) {
+  .faqPage {
+    padding-top: 120px;
+  }
+  
+  .hero {
+    margin-bottom: 40px;
+  }
+}

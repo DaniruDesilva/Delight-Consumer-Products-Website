@@ -1,0 +1,141 @@
+.loginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1d23 0%, #2d3748 100%);
+  padding: 20px;
+}
+
+.loginCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.logoCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3A6B4C, #5a9b6e);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 auto 20px;
+  font-family: var(--font-heading);
+}
+
+.brand h1 {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1d23;
+  margin-bottom: 6px;
+}
+
+.brand p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.errorMsg {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  border: 1px solid #fecaca;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.02em;
+}
+
+.field input {
+  padding: 14px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: all 0.2s ease;
+  color: #1a1d23;
+  background: #f9fafb;
+}
+
+.field input::placeholder {
+  color: #9ca3af;
+}
+
+.field input:focus {
+  border-color: #3A6B4C;
+  box-shadow: 0 0 0 3px rgba(58, 107, 76, 0.1);
+  background: #fff;
+}
+
+.submitBtn {
+  padding: 14px;
+  background: linear-gradient(135deg, #3A6B4C, #4a7d5e);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+.submitBtn:hover {
+  box-shadow: 0 8px 24px rgba(58, 107, 76, 0.35);
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hint {
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 24px;
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 36px 24px;
+  }
+}

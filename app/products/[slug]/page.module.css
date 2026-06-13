@@ -1,0 +1,241 @@
+.pageContainer {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.hero {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  max-height: 600px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 2;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  color: white;
+  padding-top: 60px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  margin-bottom: 40px;
+  transition: color 0.3s ease;
+}
+
+.backLink:hover {
+  color: white;
+}
+
+.subtitle {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary-green-light);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 5vw, 64px);
+  margin-bottom: 24px;
+  line-height: 1.1;
+}
+
+.description {
+  font-size: clamp(16px, 2vw, 20px);
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.detailSection {
+  padding: 100px 0;
+  background: var(--bg-base);
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* If there's a detail image, use 2 columns on desktop */
+.contentGrid:has(.detailImageWrapper) {
+  grid-template-columns: 1fr 1fr;
+}
+
+.richText {
+  color: var(--text-body);
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.richText h2 {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  color: var(--text-main);
+  margin-top: 48px;
+  margin-bottom: 24px;
+}
+
+.richText h2:first-child {
+  margin-top: 0;
+}
+
+.richText p {
+  margin-bottom: 24px;
+}
+
+.richText ul {
+  margin-bottom: 24px;
+  padding-left: 24px;
+}
+
+.richText li {
+  margin-bottom: 12px;
+}
+
+.detailImageWrapper {
+  position: relative;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 120px;
+}
+
+.ctaSection {
+  padding: 100px 0;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.ctaSection h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 4vw, 40px);
+  margin-bottom: 40px;
+  color: var(--text-main);
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primaryBtn, .secondaryBtn {
+  padding: 16px 40px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.primaryBtn {
+  background: var(--primary-green);
+  color: white;
+  box-shadow: 0 4px 15px rgba(58, 107, 76, 0.2);
+}
+
+.primaryBtn:hover {
+  background: var(--primary-green-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(58, 107, 76, 0.3);
+}
+
+.secondaryBtn {
+  background: transparent;
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
+}
+
+.secondaryBtn:hover {
+  background: var(--primary-green);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .contentGrid:has(.detailImageWrapper) {
+    grid-template-columns: 1fr;
+  }
+  .detailImageWrapper {
+    height: 400px;
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 50vh;
+  }
+  .detailSection, .ctaSection {
+    padding: 60px 0;
+  }
+  .richText h2 {
+    font-size: 28px;
+    margin-top: 40px;
+  }
+  .ctaButtons {
+    flex-direction: column;
+  }
+  .primaryBtn, .secondaryBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero { height: 40vh; min-height: 280px; }
+  .title { font-size: 32px; }
+  .description { font-size: 15px; }
+  .heroContent { padding-top: 40px; }
+  .detailSection, .ctaSection { padding: 48px 0; }
+  .contentGrid { gap: 40px; }
+  .richText { font-size: 15px; }
+  .richText h2 { font-size: 24px; margin-top: 32px; }
+  .ctaSection h2 { font-size: 24px; }
+  .primaryBtn, .secondaryBtn { padding: 14px; font-size: 12px; }
+}

@@ -1,0 +1,183 @@
+.successPage {
+  padding: 160px 0 80px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.loading, .errorContainer {
+  padding: 200px 0;
+  text-align: center;
+}
+
+.successHeader {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.successIcon {
+  color: #3A6B4C;
+  margin-bottom: 20px;
+}
+
+.pendingIcon {
+  color: #f59e0b;
+  margin-bottom: 20px;
+}
+
+.successHeader h1 {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  color: #1a1d23;
+  margin-bottom: 10px;
+}
+
+.orderNum {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.pendingNotice {
+  max-width: 600px;
+  margin: 20px auto 0;
+  padding: 16px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 15px;
+}
+
+.successGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1a1d23;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  color: #4b5563;
+}
+
+.summaryTotals {
+  padding-top: 20px;
+  border-top: 2px solid #f3f4f6;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.discount {
+  color: #059669;
+  font-weight: 600;
+}
+
+.finalTotal {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 20px;
+  font-weight: 800;
+  color: #3A6B4C;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.statusBadge[data-status="pending"] { background: #fef3c7; color: #92400e; }
+.statusBadge[data-status="processing"] { background: #dcfce7; color: #166534; }
+.statusBadge[data-status="pending_payment"] { background: #fee2e2; color: #991b1b; }
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: #3A6B4C;
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.continueBtn:hover {
+  background: #2a4d37;
+  transform: translateY(-2px);
+}
+
+.ordersBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px 32px;
+  background: white;
+  color: #3A6B4C;
+  border: 2px solid #3A6B4C;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.ordersBtn:hover {
+  background: #f0fdf4;
+}
+
+@media (max-width: 992px) {
+  .successGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+  }
+  .continueBtn, .ordersBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

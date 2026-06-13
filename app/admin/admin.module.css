@@ -1,0 +1,113 @@
+.adminRoot {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f5f7;
+}
+
+.mainArea {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s cubic-bezier(0.25, 0.4, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mainCollapsed {
+  margin-left: 72px;
+}
+
+/* ─── Top Bar ─── */
+.topBar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e8eaed;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topBarTitle h2 {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1d23;
+  letter-spacing: -0.01em;
+}
+
+.topBarRight {
+  margin-left: auto;
+}
+
+.adminBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3A6B4C, #5a9b6e);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.adminName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1d23;
+}
+
+.mobileMenu {
+  display: none;
+  background: none;
+  border: none;
+  color: #1a1d23;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.mobileMenu:hover {
+  background: #f0f0f0;
+}
+
+/* ─── Content ─── */
+.content {
+  flex: 1;
+  padding: 32px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .mainArea,
+  .mainCollapsed {
+    margin-left: 0;
+  }
+
+  .mobileMenu {
+    display: flex;
+  }
+
+  .topBar {
+    padding: 0 16px;
+  }
+
+  .content {
+    padding: 20px 16px;
+  }
+
+  .adminName {
+    display: none;
+  }
+}

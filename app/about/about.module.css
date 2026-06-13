@@ -1,0 +1,399 @@
+.aboutPage {
+  background: var(--bg-base);
+  overflow-x: hidden;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--primary-green);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.centeredHeader {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 40px;
+}
+
+.centeredHeader h2 {
+  font-size: clamp(32px, 4vw, 56px);
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-base);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* ─── Hero ─── */
+.hero {
+  position: relative;
+  height: 60vh;
+  min-height: 450px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.heroBackground {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  z-index: 1;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 2;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  color: white;
+  text-align: center;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.heroContent h1 {
+  margin: 0 0 16px 0;
+  font-size: clamp(3rem, 6vw, 6rem);
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.heroSubtitle {
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 300;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Who We Are ─── */
+.whoWeAre {
+  padding: 120px 0;
+  background: var(--bg-base);
+}
+
+.introText {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.introText p {
+  color: var(--text-body);
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.introText strong {
+  color: var(--text-base);
+  font-weight: 600;
+}
+
+/* ─── What We Do ─── */
+.whatWeDo {
+  padding: 120px 0;
+  background: var(--bg-surface);
+}
+
+.visualContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.08);
+}
+
+.textContent h2 {
+  font-size: clamp(32px, 4vw, 56px);
+  margin: 0 0 32px 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.formattedText p {
+  color: var(--text-body);
+  font-size: 18px;
+  line-height: 1.9;
+  margin-bottom: 24px;
+}
+
+/* ─── Mission & Vision ─── */
+.missionVision {
+  padding: 120px 0;
+  background: var(--bg-base);
+}
+
+.cardBox {
+  background: var(--bg-elevated);
+  padding: 60px;
+  border-radius: 24px;
+  height: 100%;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.03);
+  transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease;
+}
+
+.cardBox:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 80px rgba(58, 107, 76, 0.08);
+}
+
+.cardBox h3 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin: 0 0 24px 0;
+  line-height: 1.2;
+}
+
+.cardText p {
+  color: var(--text-body);
+  font-size: 17px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.cardText strong {
+  color: var(--primary-green);
+  font-weight: 600;
+  display: block;
+  font-size: 20px;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+/* ─── Our Commitment ─── */
+.commitment {
+  padding: 120px 0;
+  background: var(--bg-surface);
+}
+
+.commitmentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 60px;
+}
+
+.commitmentItem {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--bg-base);
+  padding: 32px 40px;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s ease;
+}
+
+.commitmentItem:hover {
+  border-color: var(--primary-green);
+  transform: translateX(8px);
+}
+
+.commitmentNumber {
+  font-family: var(--font-heading);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--primary-green);
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.commitmentItem h4 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-base);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ─── Our Journey ─── */
+.journey {
+  padding: 120px 0;
+  background: var(--bg-base);
+}
+
+.journeyBox {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 80px;
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+  border-radius: 32px;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.journeyBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-green), var(--primary-brown));
+}
+
+.journeyBox h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 0 0 32px 0;
+}
+
+.journeyText p {
+  color: var(--text-body);
+  font-size: 18px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.journeyText strong {
+  display: block;
+  margin-top: 32px;
+  font-size: 20px;
+  color: var(--primary-green);
+  font-weight: 600;
+}
+
+/* ─── Partners ─── */
+.partners {
+  padding: 60px 0 100px;
+  background: var(--bg-base);
+}
+
+.partnerFlex {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  align-items: center;
+  opacity: 0.15;
+}
+
+.partnerLogo {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--primary-brown);
+}
+
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .grid2 {
+    gap: 40px;
+  }
+  .whoWeAre, .whatWeDo, .missionVision, .commitment, .journey {
+    padding: 100px 0;
+  }
+  .cardBox {
+    padding: 40px;
+  }
+  .journeyBox {
+    padding: 60px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 40vh;
+    min-height: 350px;
+  }
+  .grid2 {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+  .commitmentGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .whoWeAre, .whatWeDo, .missionVision, .commitment, .journey {
+    padding: 80px 0;
+  }
+  .visualContainer {
+    height: 400px;
+    aspect-ratio: auto;
+  }
+  .partnerFlex {
+    gap: 40px;
+  }
+  .partnerLogo {
+    font-size: 24px;
+    letter-spacing: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 300px;
+  }
+  .heroSubtitle {
+    font-size: 16px;
+  }
+  .whoWeAre, .whatWeDo, .missionVision, .commitment, .journey {
+    padding: 60px 0;
+  }
+  .introText p {
+    font-size: 16px;
+  }
+  .formattedText p {
+    font-size: 16px;
+  }
+  .cardBox {
+    padding: 32px 24px;
+  }
+  .commitmentItem {
+    padding: 24px;
+    gap: 16px;
+  }
+  .commitmentItem h4 {
+    font-size: 16px;
+  }
+  .commitmentNumber {
+    font-size: 32px;
+  }
+  .journeyBox {
+    padding: 40px 24px;
+  }
+  .journeyText p {
+    font-size: 16px;
+  }
+  .journeyText strong {
+    font-size: 18px;
+  }
+  .partnerFlex {
+    flex-direction: column;
+    gap: 24px;
+  }
+}

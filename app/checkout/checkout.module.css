@@ -1,0 +1,386 @@
+.checkoutPage {
+  padding: 160px 0 80px;
+  min-height: 80vh;
+  background-color: #ffffff;
+}
+
+/* Breadcrumbs */
+.progressNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.activeStep {
+  color: #3A6B4C;
+  font-weight: 500;
+}
+
+.inactiveStep {
+  color: #d1d5db;
+  font-weight: 300;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.inactiveStep:hover {
+  color: #9ca3af;
+}
+
+.stepArrow {
+  color: #d1d5db;
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.loginPrompt {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.loginPrompt a {
+  color: #3A6B4C;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.loginPrompt a:hover {
+  text-decoration: underline;
+}
+
+.checkoutLayout {
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Left Column: Billing Details */
+.billingDetails h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1d23;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="tel"],
+.formGroup input[type="email"],
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.2s;
+  background: #ffffff;
+  color: #1a1d23;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  border-color: #3A6B4C;
+}
+
+.streetInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.checkboxGroup input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkboxGroup label {
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+/* Right Column: Order Summary */
+.orderSummaryBox {
+  border: 2px solid #3A6B4C;
+  padding: 30px;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.orderSummaryBox h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1d23;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+}
+
+.orderItemsHeader {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 13px;
+  color: #6b7280;
+  text-transform: uppercase;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.orderItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.orderItemRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.orderItemRow span:last-child {
+  font-weight: 600;
+  color: #1a1d23;
+  white-space: nowrap;
+  margin-left: 20px;
+}
+
+.summaryTotals {
+  padding: 20px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.totalRow span:last-child {
+  font-weight: 600;
+  color: #1a1d23;
+}
+
+.finalTotal {
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.finalTotal span:first-child {
+  font-weight: 600;
+}
+
+.finalTotal span:last-child {
+  font-size: 20px;
+  font-weight: 800;
+  color: #3A6B4C;
+}
+
+/* Payment Methods */
+.paymentMethods {
+  margin: 24px 0;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.paymentOption input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #3A6B4C;
+  cursor: pointer;
+}
+
+.paymentLabel {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a1d23;
+}
+
+.activePayment .paymentLabel {
+  color: #3A6B4C;
+}
+
+.paymentDesc {
+  padding: 16px 20px;
+  margin: 8px 0 16px 28px;
+  background: #ffffff;
+  border-left: 3px solid #3A6B4C;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  border-radius: 0 4px 4px 0;
+}
+
+.bankInfo {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #1a1d23;
+  line-height: 1.6;
+}
+
+.slipUpload {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #d1d5db;
+}
+
+.slipUpload label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.slipUpload input {
+  font-size: 12px;
+}
+
+.uploadingText {
+  color: #3A6B4C;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.uploadSuccess {
+  color: #059669;
+  font-weight: 600;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.checkoutError {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.placeOrderBtn {
+  width: 100%;
+  padding: 16px;
+  background: #3A6B4C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.placeOrderBtn:hover {
+  background: #2a4d37;
+}
+
+.placeOrderBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.privacyNotice {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.privacyNotice a {
+  color: #3A6B4C;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.privacyNotice a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .checkoutLayout {
+    grid-template-columns: 1fr;
+  }
+  
+  .progressNav {
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+  
+  .orderSummaryBox {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

@@ -1,0 +1,285 @@
+.accountPage {
+  padding-top: 160px;
+  padding-bottom: 80px;
+  min-height: 70vh;
+}
+
+.loginPrompt {
+  text-align: center;
+  padding: 80px 20px;
+}
+.loginPrompt h2 { font-size: 22px; color: #1a1d23; margin: 16px 0 8px; }
+.loginPrompt p { color: #6b7280; }
+
+.pageGrid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  padding: 20px 0;
+}
+
+/* ─── Sidebar ─── */
+.profileCard {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  border: 1px solid #e8eaed;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, #3A6B4C, #5a9b6e);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 800; margin: 0 auto 16px;
+}
+
+.profileCard h3 { font-size: 16px; font-weight: 700; color: #1a1d23; margin-bottom: 4px; }
+.profileCard p { font-size: 13px; color: #9ca3af; }
+
+.sideNav { display: flex; flex-direction: column; gap: 4px; }
+
+.sideLink {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px; border-radius: 12px;
+  font-size: 14px; font-weight: 500; color: #374151;
+  background: none; border: none; cursor: pointer;
+  text-decoration: none; width: 100%; text-align: left;
+  transition: all 0.2s ease; font-family: var(--font-body);
+}
+.sideLink:hover { background: #f3f4f6; color: #3A6B4C; }
+.sideLinkActive { background: #f0fdf4 !important; color: #3A6B4C !important; font-weight: 600; }
+
+.tabCount {
+  margin-left: auto; background: #e8eaed; color: #6b7280;
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+}
+
+.mobileNavSelectWrap { display: none; }
+
+/* ─── Main ─── */
+.mainCol h1 {
+  font-family: var(--font-heading);
+  font-size: 24px; font-weight: 700; color: #1a1d23; margin-bottom: 24px;
+}
+
+.empty {
+  text-align: center; padding: 60px 20px;
+  background: white; border-radius: 16px; border: 1px solid #e8eaed;
+}
+.empty h3 { font-size: 18px; color: #6b7280; margin: 16px 0 8px; }
+.empty p { color: #9ca3af; font-size: 14px; margin-bottom: 24px; }
+
+.shopBtn {
+  display: inline-block; padding: 12px 28px;
+  background: #3A6B4C; color: white; border-radius: 12px;
+  font-weight: 700; font-size: 14px;
+}
+
+/* ─── Orders ─── */
+.ordersList { display: flex; flex-direction: column; gap: 16px; }
+
+.orderCard {
+  background: white; border-radius: 16px; border: 1px solid #e8eaed;
+  overflow: hidden; transition: box-shadow 0.3s ease;
+}
+.orderCard:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); }
+
+.orderHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 24px; border-bottom: 1px solid #f3f4f6;
+}
+.orderNum { font-weight: 700; font-size: 15px; color: #1a1d23; margin-right: 16px; }
+.orderDate { font-size: 13px; color: #9ca3af; }
+.statusBadge { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.orderItems { padding: 16px 24px; }
+.orderItem { display: flex; justify-content: space-between; font-size: 14px; color: #6b7280; padding: 4px 0; }
+.orderFooter {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px; background: #f9fafb; flex-wrap: wrap; gap: 8px;
+}
+.shipAddr { font-size: 13px; color: #9ca3af; }
+.orderTotal { font-size: 15px; color: #1a1d23; }
+
+/* ─── Wishlist ─── */
+.wishlistGrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.wishlistCard {
+  background: white; border-radius: 16px; border: 1px solid #e8eaed;
+  overflow: hidden; transition: all 0.3s ease;
+}
+.wishlistCard:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); transform: translateY(-2px); }
+
+.wishlistImage {
+  position: relative; aspect-ratio: 1; display: block;
+  background: #f5f5f5;
+}
+
+.wishlistInfo { padding: 16px; }
+.wishlistCat { font-size: 11px; font-weight: 600; color: #3A6B4C; text-transform: uppercase; letter-spacing: 0.05em; }
+.wishlistName { display: block; font-size: 15px; font-weight: 600; color: #1a1d23; margin: 6px 0; line-height: 1.4; text-decoration: none; }
+.wishlistName:hover { color: #3A6B4C; }
+
+.wishlistPriceRow { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.wishlistPrice { font-size: 16px; font-weight: 800; color: #1a1d23; }
+.wishlistOldPrice { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
+
+.wishlistActions { display: flex; gap: 8px; }
+.viewBtn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; background: #3A6B4C; color: white; border-radius: 10px;
+  font-size: 13px; font-weight: 700; text-decoration: none; transition: all 0.2s;
+}
+.viewBtn:hover { background: #2d5a3f; }
+.removeWishBtn {
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid #fecaca; border-radius: 10px; background: #fef2f2;
+  color: #dc2626; cursor: pointer; transition: all 0.2s;
+}
+.removeWishBtn:hover { background: #fee2e2; }
+
+/* ─── Profile ─── */
+.profileSection { display: flex; flex-direction: column; gap: 20px; }
+
+.profileFormCard {
+  background: white; border-radius: 16px; padding: 28px;
+  border: 1px solid #e8eaed;
+}
+.profileFormCard h3 {
+  font-size: 16px; font-weight: 700; color: #1a1d23; margin-bottom: 20px;
+  padding-bottom: 14px; border-bottom: 1px solid #f0f0f0;
+}
+
+.profileFields { display: flex; flex-direction: column; gap: 16px; }
+.profileField { display: flex; flex-direction: column; gap: 6px; }
+.profileField label { font-size: 13px; font-weight: 600; color: #374151; }
+.profileField input {
+  padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+  font-size: 14px; font-family: var(--font-body); outline: none;
+  transition: all 0.2s ease; color: #1a1d23; background: #f9fafb;
+}
+.profileField input:focus { border-color: #3A6B4C; box-shadow: 0 0 0 3px rgba(58,107,76,0.08); background: white; }
+.profileField input:disabled { color: #9ca3af; cursor: not-allowed; }
+.fieldHint { font-size: 11px; color: #9ca3af; }
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.passwordWrapper input {
+  padding-right: 48px !important;
+}
+
+.toggleBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  color: #1a1d23;
+  background: #f3f4f6;
+}
+
+.profileMsg {
+  margin-top: 12px; padding: 10px 14px; background: #d1fae5; color: #065f46;
+  border-radius: 10px; font-size: 13px; font-weight: 600;
+}
+
+.saveProfileBtn {
+  margin-top: 20px; padding: 12px 28px;
+  background: linear-gradient(135deg, #3A6B4C, #4a7d5e);
+  color: white; border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-body); transition: all 0.3s ease;
+}
+.saveProfileBtn:hover { box-shadow: 0 8px 24px rgba(58,107,76,0.35); }
+
+.summaryStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.summaryStat {
+  text-align: center; padding: 20px; background: #f9fafb; border-radius: 12px;
+}
+.summaryNum { display: block; font-size: 22px; font-weight: 800; color: #1a1d23; margin-bottom: 4px; }
+.summaryLabel { font-size: 12px; color: #9ca3af; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .pageGrid { grid-template-columns: 1fr; }
+  .profileCard { margin-bottom: 0; }
+  
+  .sideNav { display: none; }
+  
+  .mobileNavSelectWrap {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  
+  .mobileNavSelect { 
+    width: 100%; 
+    padding: 14px 16px; 
+    border: 1.5px solid #e5e7eb; 
+    border-radius: 12px;
+    font-family: var(--font-body); 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #1a1d23;
+    appearance: none; 
+    background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233A6B4C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 16px center; 
+    outline: none; 
+    cursor: pointer;
+  }
+  
+  .orderHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .wishlistGrid { grid-template-columns: 1fr; }
+  .summaryStats { grid-template-columns: 1fr; }
+}
+
+.returnNotice {
+  margin: 10px 24px;
+  padding: 12px 16px;
+  background: #fff9eb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.returnIcon {
+  font-size: 18px;
+}
+
+.returnInfo {
+  font-size: 13px;
+  color: #92400e;
+  flex: 1;
+}
+
+.returnStatus {
+  margin-left: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.returnStatus[data-status="approved"] { color: #10b981; }
+.returnStatus[data-status="rejected"] { color: #ef4444; }
+.returnStatus[data-status="pending"] { color: #f59e0b; }

@@ -1,0 +1,616 @@
+.careersPage {
+  background: #fdfbf7; /* Very light warm tint */
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: #1a1a1a;
+  overflow-x: hidden;
+}
+
+/* ─── Hero Section ─── */
+.hero {
+  position: relative;
+  padding: 220px 0 120px;
+  background: linear-gradient(135deg, #1a2e20 0%, #3a6b4c 50%, #4a3320 100%);
+  color: #fff;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.15), transparent 60%);
+  animation: rotateGradient 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotateGradient {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.heroLayout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  flex: 1;
+}
+
+.heroImageWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.heroLogo {
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  opacity: 1;
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3)) brightness(1.2);
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.categoryLabel {
+  display: inline-block;
+  font-family: var(--font-playfair);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: #ffd700; /* Yellow accent */
+  margin-bottom: 1.5rem;
+  padding: 8px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  font-weight: 800;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.hero p {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: #e5e7eb;
+  margin-bottom: 3rem;
+  max-width: 600px;
+}
+
+.heroStats {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 24px 32px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.stat:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stat strong {
+  font-size: 2.5rem;
+  font-family: var(--font-playfair);
+  color: #ffd700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat span {
+  font-size: 0.9rem;
+  color: #d1fae5;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+/* ─── Shared Section Headers ─── */
+.sectionHeader {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 60px;
+}
+
+.sectionHeader h2 {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  margin-bottom: 1.2rem;
+  color: #1a2e20; /* Dark Green */
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.sectionHeader p {
+  font-size: 1.2rem;
+  color: #4a3320; /* Brown text */
+  line-height: 1.6;
+}
+
+/* ─── Values Section ─── */
+.valuesSection {
+  padding: 120px 0;
+  background: #fff;
+  position: relative;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+}
+
+.valueCard {
+  background: #fdfbf7;
+  padding: 40px;
+  border-radius: 24px;
+  text-align: left;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(139, 90, 43, 0.1); /* Subtle brown border */
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.valueCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(58, 107, 76, 0.05), rgba(255, 215, 0, 0.05));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.valueCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(74, 51, 32, 0.08); /* Brown shadow */
+  border-color: rgba(58, 107, 76, 0.3); /* Green border on hover */
+}
+
+.valueCard:hover::before {
+  opacity: 1;
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #3a6b4c, #2a4d36);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(58, 107, 76, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.valueCard:hover .iconWrapper {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, #4a3320, #8b5a2b); /* Changes to brown */
+}
+
+.valueCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1a2e20;
+  font-weight: 700;
+}
+
+.valueCard p {
+  color: #4a3320;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+/* ─── Perks Section ─── */
+.perksSection {
+  padding: 120px 0;
+  background: linear-gradient(to bottom, #fdfbf7, #f4f7f5);
+}
+
+.perksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.perkItem {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  border-top: 4px solid #ffd700; /* Yellow accent line */
+  transition: transform 0.3s ease;
+}
+
+.perkItem:nth-child(even) {
+  border-top-color: #3a6b4c; /* Green accent line */
+}
+
+.perkItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+}
+
+.perkItem h3 {
+  font-size: 1.3rem;
+  color: #1a2e20;
+}
+
+.perkItem p {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* ─── Quote Section ─── */
+.quoteSection {
+  padding: 100px 0;
+  background: #1a2e20;
+  color: #fff;
+  text-align: center;
+  position: relative;
+}
+
+.quoteSection::after {
+  content: '"';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-playfair);
+  font-size: 300px;
+  color: rgba(255, 215, 0, 0.05); /* Very faint yellow quote mark */
+  pointer-events: none;
+  z-index: 0;
+}
+
+.quoteContent {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.quoteText {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-family: var(--font-playfair);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+
+.quoteAuthor {
+  font-size: 1.1rem;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+/* ─── Openings Section ─── */
+.openingsSection {
+  padding: 120px 0;
+  background: #fff;
+}
+
+.openingsLayout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.filterSidebar {
+  position: sticky;
+  top: 100px;
+  background: #fdfbf7;
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid rgba(139, 90, 43, 0.1);
+}
+
+.filterSidebar h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #1a2e20;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterBtn {
+  text-align: left;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: #4a3320;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 1rem;
+  font-family: var(--font-body);
+}
+
+.filterBtn:hover {
+  background: rgba(58, 107, 76, 0.05);
+  color: #3a6b4c;
+}
+
+.filterBtn.active {
+  background: #3a6b4c;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(58, 107, 76, 0.2);
+}
+
+.jobsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.jobCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.jobCard::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #3a6b4c;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+  transform-origin: bottom;
+}
+
+.jobCard:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  border-color: transparent;
+  transform: translateX(5px);
+}
+
+.jobCard:hover::before {
+  transform: scaleY(1);
+}
+
+.deptBadge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255, 215, 0, 0.15); /* Yellow tint */
+  color: #8b5a2b; /* Brown text */
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 30px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.jobInfo h3 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  color: #1a2e20;
+  font-weight: 700;
+}
+
+.jobMeta {
+  display: flex;
+  gap: 24px;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.jobMeta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jobAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 140px;
+  height: 50px;
+  border-radius: 25px;
+  background: #fdfbf7;
+  color: #3a6b4c;
+  font-weight: 600;
+  border: 1px solid rgba(58, 107, 76, 0.2);
+  transition: all 0.3s ease;
+}
+
+.jobCard:hover .jobAction {
+  background: #3a6b4c;
+  color: #fff;
+  border-color: #3a6b4c;
+}
+
+/* ─── Spontaneous ─── */
+.spontaneousSection {
+  padding: 0 0 120px;
+  background: #fff;
+}
+
+.spontaneousCard {
+  background: linear-gradient(135deg, #fdfbf7 0%, #f4f7f5 100%);
+  border-radius: 30px;
+  padding: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+  border: 1px solid rgba(139, 90, 43, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.spontaneousCard::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.spontaneousText h2 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: #1a2e20;
+}
+
+.spontaneousText p {
+  color: #4a3320;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #3a6b4c, #2a4d36);
+  color: #fff;
+  padding: 20px 40px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(58, 107, 76, 0.2);
+  border: none;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(58, 107, 76, 0.3);
+  background: linear-gradient(135deg, #4a3320, #8b5a2b); /* Brown hover */
+}
+
+.loader {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+.noJobs {
+  text-align: center;
+  padding: 80px 40px;
+  background: #fdfbf7;
+  border-radius: 20px;
+  border: 1px dashed #d1d5db;
+}
+
+.noJobs h3 {
+  font-size: 1.5rem;
+  color: #1a2e20;
+  margin-bottom: 10px;
+}
+
+.noJobs p {
+  color: #6b7280;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .openingsLayout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .filterSidebar {
+    position: static;
+  }
+  .filterList {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .heroLayout {
+    flex-direction: column;
+    text-align: center;
+  }
+  .heroImageWrapper {
+    margin-top: 40px;
+  }
+  .heroStats {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 180px 0 80px; }
+  .hero h1 { font-size: 2.5rem; }
+  .heroStats { flex-direction: column; gap: 20px; }
+  .heroImageWrapper { display: none; }
+  .spontaneousCard { flex-direction: column; padding: 40px; text-align: center; }
+  .jobCard { flex-direction: column; align-items: flex-start; gap: 24px; padding: 30px; }
+  .jobAction { width: 100%; }
+}
