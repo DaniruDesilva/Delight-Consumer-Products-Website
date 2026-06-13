@@ -1,6 +1,6 @@
-# Delight 🛍️✨
+# Delight Consumer Products Company Website🛍️✨
 
-Welcome to **Delight**, a full-featured, modern e-commerce web application built with [Next.js](https://nextjs.org/) and the App Router. It is designed to offer a seamless shopping experience for customers and a powerful management interface for administrators.
+Welcome to **Delight Consumer Products Company**, a full-featured, modern web application built with [Next.js](https://nextjs.org/) and the App Router. It is designed to offer a seamless shopping experience for customers and a powerful management interface for administrators.
 
 ---
 
