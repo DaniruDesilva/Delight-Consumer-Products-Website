@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // ─── Hosting Compatibility ───
+  output: 'standalone',
+
   // ─── URL Normalization ───
   trailingSlash: false,
 
