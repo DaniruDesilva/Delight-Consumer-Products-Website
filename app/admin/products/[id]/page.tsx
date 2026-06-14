@@ -161,8 +161,8 @@ export default function EditProductPage() {
                     </div>
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Minimum Order Quantity</label>
-                    <input name="min_order_quantity" type="number" value={form.min_order_quantity} onChange={handleChange} min="1" placeholder="1" />
+                    <label>Minimum Order Quantity (MOQ)</label>
+                    <input name="min_order_quantity" type="number" value={form.min_order_quantity} onChange={handleChange} min="1" placeholder="1" required />
                   </div>
                 </div>
               </div>

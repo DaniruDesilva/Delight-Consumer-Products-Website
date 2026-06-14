@@ -510,20 +510,7 @@ function initTables(db: Database.Database) {
   }
 
 
-  // Seed sample orders
-  const orderCount = db.prepare('SELECT COUNT(*) as count FROM orders').get() as { count: number };
-  if (orderCount.count === 0) {
-    const orders = [
-      { order_number: 'DLT-001', customer_name: 'Kasun Perera', customer_email: 'kasun@gmail.com', customer_phone: '+94 77 123 4567', items_json: JSON.stringify([{ name: 'Lavender Incense', qty: 2, price: 1620 }]), subtotal: 3240, shipping: 250, total: 3490, status: 'delivered' },
-      { order_number: 'DLT-002', customer_name: 'Nimali Silva', customer_email: 'nimali@gmail.com', customer_phone: '+94 71 234 5678', items_json: JSON.stringify([{ name: 'Oud Ires Perfume', qty: 1, price: 2250 }]), subtotal: 2250, shipping: 250, total: 2500, status: 'shipped' },
-      { order_number: 'DLT-003', customer_name: 'Amal Fernando', customer_email: 'amal@gmail.com', customer_phone: '+94 76 345 6789', items_json: JSON.stringify([{ name: 'Car Freshener', qty: 3, price: 1200 }]), subtotal: 3600, shipping: 0, total: 3600, status: 'processing' },
-      { order_number: 'DLT-004', customer_name: 'Dilshan Rajapaksa', customer_email: 'dilshan@gmail.com', customer_phone: '+94 72 456 7890', items_json: JSON.stringify([{ name: 'Rose Incense', qty: 1, price: 1620 }, { name: 'Room Spray', qty: 2, price: 850 }]), subtotal: 3320, shipping: 250, total: 3570, status: 'pending' },
-    ];
-    const stmt = db.prepare('INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, items_json, subtotal, shipping, total, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    for (const o of orders) {
-      stmt.run(o.order_number, o.customer_name, o.customer_email, o.customer_phone, o.items_json, o.subtotal, o.shipping, o.total, o.status);
-    }
-  }
+  // Sample orders have been removed
 
   // Seed default coupons
   const couponCount = db.prepare('SELECT COUNT(*) as count FROM coupons').get() as { count: number };
