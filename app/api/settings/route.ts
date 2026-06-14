@@ -26,6 +26,8 @@ export async function GET() {
     facebook: settings.facebook,
     tiktok: settings.tiktok,
     youtube: settings.youtube,
+    free_shipping_threshold: settings.free_shipping_threshold,
+    show_brands_section: settings.show_brands_section ?? '1',
   };
 
   const response = { settings: publicSettings };

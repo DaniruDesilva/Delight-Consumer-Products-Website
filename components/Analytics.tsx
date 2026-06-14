@@ -120,11 +120,13 @@ export default function Analytics() {
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button 
           onClick={handleReject}
+          suppressHydrationWarning
           style={{ background: 'transparent', border: '1px solid #d1d5db', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 500, color: '#374151', cursor: 'pointer' }}>
           Reject All
         </button>
         <button 
           onClick={handleAccept}
+          suppressHydrationWarning
           style={{ background: '#166534', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 500, color: '#fff', cursor: 'pointer' }}>
           Accept All
         </button>

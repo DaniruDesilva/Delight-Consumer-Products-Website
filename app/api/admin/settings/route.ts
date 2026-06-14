@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
+import { apiCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,8 @@ export async function PUT(request: Request) {
       for (const [key, value] of Object.entries(data.settings)) {
         db.updateSetting(key, value as string);
       }
+      // Invalidate the in-memory cache so frontend sees changes immediately
+      apiCache.invalidate('settings');
       // Revalidate the entire layout to apply site_status and global settings changes immediately
       revalidatePath('/', 'layout');
       return NextResponse.json({ success: true });

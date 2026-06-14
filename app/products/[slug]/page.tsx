@@ -135,14 +135,18 @@ export default async function ProductInfoPage({ params }: { params: Promise<{ sl
           </div>
 
           <div className={`container ${styles.heroContent}`}>
-            <Link href="/" className={styles.backLink}>
-              <ChevronLeft size={20} /> Back to Home
-            </Link>
-            <ScrollReveal>
-              <span className={styles.subtitle}>{card.subtitle}</span>
-              <h1 className={styles.title}>{card.title}</h1>
-              <p className={styles.description}>{card.description}</p>
-            </ScrollReveal>
+            <div className={styles.heroContentInner}>
+              <Link href="/" className={styles.backLink}>
+                <ChevronLeft size={20} /> Back to Home
+              </Link>
+              <div className={styles.heroCard}>
+                <ScrollReveal>
+                  <span className={styles.subtitle}>{card.subtitle}</span>
+                  <h1 className={styles.title}>{card.title}</h1>
+                  <p className={styles.description}>{card.description}</p>
+                </ScrollReveal>
+              </div>
+            </div>
           </div>
         </section>
 

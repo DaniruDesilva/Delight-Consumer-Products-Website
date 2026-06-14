@@ -121,7 +121,7 @@ export default function Header() {
                     <ChevronDown size={14} className={styles.chevron} />
                   </button>
                 ) : (
-                  <button className={styles.loginBtn} onClick={() => setAuthOpen(true)}>
+                  <button className={styles.loginBtn} onClick={() => setAuthOpen(true)} suppressHydrationWarning>
                     <User size={20} strokeWidth={1.8} />
                     <div className={styles.accountText}>
                       <span className={styles.accountName}>SIGN IN</span>
@@ -176,8 +176,9 @@ export default function Header() {
                 placeholder="Search products..." 
                 value={searchQuery} 
                 onChange={e => setSearchQuery(e.target.value)} 
+                suppressHydrationWarning
               />
-              <button type="submit"><Search size={16} strokeWidth={2} /></button>
+              <button type="submit" suppressHydrationWarning><Search size={16} strokeWidth={2} /></button>
             </form>
           </div>
         </div>

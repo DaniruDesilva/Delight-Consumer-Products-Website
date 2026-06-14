@@ -12,7 +12,7 @@ export default function NewProductPage() {
   const [form, setForm] = useState({
     name: '', description: '', short_description: '', long_description: '', key_features: '',
     price: '', original_price: '',
-    image: '/incense.png', category: 'Incense', stock: '0',
+    image: 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477142/delight_static/l3phgjchpgvmuxhdakp2.png', category: 'Incense', stock: '0',
     weight: '1', weight_unit: 'kg', min_order_quantity: '1',
     is_featured: false, is_sale: false, status: 'active',
   });

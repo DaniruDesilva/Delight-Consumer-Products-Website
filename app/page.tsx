@@ -51,6 +51,8 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [pageContent, setPageContent] = useState<Record<string, string>>({});
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState('5000');
+  const [showBrandsSection, setShowBrandsSection] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -67,7 +69,8 @@ export default function Home() {
       fetch(`/api/brands?t=${t}`).then(r => r.ok ? r.json() : { brands: [] }).catch(() => ({ brands: [] })),
       fetch(`/api/popup?t=${t}`).then(r => r.ok ? r.json() : { enabled: false }).catch(() => ({ enabled: false })),
       fetch(`/api/content?page=home&t=${t}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
-    ]).then(([slidesData, categoriesData, infoData, productsData, brandsData, popupData, contentData]) => {
+      fetch(`/api/settings?t=${t}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    ]).then(([slidesData, categoriesData, infoData, productsData, brandsData, popupData, contentData, settingsData]) => {
       setSlides(slidesData.slides || []);
       setCategories(categoriesData.categories || []);
       setInfoCards(infoData.cards || []);
@@ -84,6 +87,13 @@ export default function Home() {
         }
       }
       setPageContent(contentMap);
+      const sData = settingsData as any;
+      if (sData?.settings?.free_shipping_threshold) {
+        setFreeShippingThreshold(sData.settings.free_shipping_threshold);
+      }
+      if (sData?.settings?.show_brands_section !== undefined) {
+        setShowBrandsSection(sData.settings.show_brands_section === '1');
+      }
       if (popupData.enabled && !localStorage.getItem('delight_popup_dismissed')) {
         setTimeout(() => setShowPopup(true), popupData.delaySeconds * 1000);
       }
@@ -142,7 +152,7 @@ export default function Home() {
                   style={{ objectFit: 'cover' }}
                   priority
                   fetchPriority="high"
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, 100vw"
                   className={slides[currentSlide].image_mobile ? styles.desktopOnlyImage : ''}
                 />
                 {slides[currentSlide].image_mobile && (
@@ -153,7 +163,7 @@ export default function Home() {
                     style={{ objectFit: 'cover' }}
                     priority
                     fetchPriority="high"
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, 100vw"
                     className={styles.mobileOnlyImage}
                   />
                 )}
@@ -206,7 +216,7 @@ export default function Home() {
             <div className={styles.trustGrid}>
               <div className={styles.trustItem}>
                 <div className={styles.trustIconCircle}><Truck size={26} strokeWidth={1.5} /></div>
-                <div className={styles.trustText}><h3>Free Shipping</h3><p>On orders over Rs. 1,500</p></div>
+                <div className={styles.trustText}><h3>Free Shipping</h3><p>On orders over Rs. {Number(freeShippingThreshold).toLocaleString()}</p></div>
               </div>
               <div className={styles.trustItem}>
                 <div className={styles.trustIconCircle}><Headset size={26} strokeWidth={1.5} /></div>
@@ -214,7 +224,7 @@ export default function Home() {
               </div>
               <div className={styles.trustItem}>
                 <div className={styles.trustIconCircle}><RotateCcw size={26} strokeWidth={1.5} /></div>
-                <div className={styles.trustText}><h3>7 Days Return</h3><p>Free return &amp; exchange</p></div>
+                <div className={styles.trustText}><h3>7 Days Return</h3><p>Selected items return &amp; exchange</p></div>
               </div>
             </div>
           </div>
@@ -230,7 +240,7 @@ export default function Home() {
             <ScrollReveal delay={0.1} scale={0.97}>
               <Parallax speed={0.25}>
                 <div className={styles.brandVisual}>
-                  <Image src={pageContent['brand_image'] || "/brand_story.png"} alt="Delight Heritage" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 50vw" />
+                  <Image src={pageContent['brand_image'] || "https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477142/delight_static/l3phgjchpgvmuxhdakp2.png"} alt="Delight Heritage" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
               </Parallax>
             </ScrollReveal>
@@ -375,7 +385,7 @@ export default function Home() {
       </section>
 
       {/* ─── 7. Brands Marquee ─── */}
-      {brands.length > 0 && (
+      {showBrandsSection && brands.length > 0 && (
         <section className={styles.brandsSection}>
           <div className="container">
             <ScrollReveal>
@@ -389,7 +399,7 @@ export default function Home() {
                 <div className={styles.marqueeTrack}>
                   {[...brands, ...brands].map((brand, i) => (
                     <div key={`${brand.id}-${i}`} className={styles.brandLogo}>
-                      <Image src={brand.image} alt={brand.name} fill style={{ objectFit: 'contain' }} sizes="150px" loading="lazy" />
+                      <Image src={brand.image} alt={brand.name} fill style={{ objectFit: 'contain' }} sizes="150px" priority={i < 6} />
                     </div>
                   ))}
                 </div>

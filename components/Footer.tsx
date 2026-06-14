@@ -168,6 +168,7 @@ const Footer = () => {
 
           <div className={styles.copyright}>
             <p>&copy; {new Date().getFullYear()} Delight Consumer Products. All Rights Reserved.</p>
+            <p className={styles.developerCredit}>Developed with <span style={{ color: '#d7ccc8' }}>♥</span> by <strong>Daniru De Silva</strong></p>
           </div>
 
           <div className={styles.socialRow}>

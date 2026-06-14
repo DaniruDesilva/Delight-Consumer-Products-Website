@@ -11,12 +11,20 @@ interface Brand {
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [showBrands, setShowBrands] = useState(true);
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState('');
 
-  const load = () => fetch('/api/admin/brands').then(r => r.json()).then(d => setBrands(d.brands || []));
+  const load = () => {
+    fetch('/api/admin/brands').then(r => r.json()).then(d => setBrands(d.brands || []));
+    fetch('/api/admin/settings').then(r => r.json()).then(d => {
+      if (d.settings?.show_brands_section !== undefined) {
+        setShowBrands(d.settings.show_brands_section === '1');
+      }
+    });
+  };
   useEffect(() => { load(); }, []);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
@@ -52,6 +60,33 @@ export default function BrandsPage() {
     <div>
       <div className={styles.pageHeader}>
         <div><h1>Brand Partners</h1><p>Manage brand logos displayed on the homepage carousel</p></div>
+      </div>
+
+      {/* Visibility Toggle */}
+      <div className={styles.card} style={{ marginBottom: 24, padding: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ fontSize: 18, marginBottom: 4 }}>Section Visibility</h2>
+          <p style={{ color: '#6b7280', fontSize: 14 }}>Show or hide the "Trusted Brands" section on the homepage.</p>
+        </div>
+        <button 
+          onClick={async () => {
+            const newValue = !showBrands;
+            setShowBrands(newValue);
+            await fetch('/api/admin/settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ settings: { show_brands_section: newValue ? '1' : '0' } })
+            });
+            showToast(`Brands section ${newValue ? 'visible' : 'hidden'}!`);
+          }}
+          style={{
+            padding: '10px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600,
+            background: showBrands ? '#ef4444' : '#10b981', color: 'white',
+            transition: 'all 0.2s'
+          }}
+        >
+          {showBrands ? 'Hide Section' : 'Show Section'}
+        </button>
       </div>
 
       {/* Add New Brand */}

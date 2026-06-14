@@ -316,6 +316,18 @@ a.contactItem:hover .contactIcon {
   font-weight: 500;
 }
 
+.developerCredit {
+  font-size: 13px !important;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 400 !important;
+}
+
+.developerCredit strong {
+  color: #d7ccc8;
+  font-weight: 600;
+}
+
 .socialRow {
   display: flex;
   align-items: center;

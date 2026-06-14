@@ -69,6 +69,8 @@
 .bentoTitle {
   font-family: var(--font-heading);
   font-size: 28px;
+  color: white; /* Override h3 default color */
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Improve readability */
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -87,24 +89,38 @@
   opacity: 0.9;
 }
 
-/* ─── Asymmetric Grid Spanning ─── */
-/* Adjust spans based on index to create the mosaic effect */
-.bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 2; }
-.bentoItem:nth-child(2) { grid-column: span 2; grid-row: span 1; }
-.bentoItem:nth-child(3) { grid-column: span 1; grid-row: span 1; }
-.bentoItem:nth-child(4) { grid-column: span 1; grid-row: span 1; }
-.bentoItem:nth-child(5) { grid-column: span 4; grid-row: span 1; }
+/* ─── Asymmetric Grid Spanning based on count ─── */
+.bentoContainer[data-count="1"] .bentoItem { grid-column: span 4; grid-row: span 2; }
 
-/* ─── Responsive ─── */
+.bentoContainer[data-count="2"] .bentoItem { grid-column: span 2; grid-row: span 2; }
+
+.bentoContainer[data-count="3"] .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.bentoContainer[data-count="3"] .bentoItem:nth-child(2) { grid-column: span 2; grid-row: span 1; }
+.bentoContainer[data-count="3"] .bentoItem:nth-child(3) { grid-column: span 2; grid-row: span 1; }
+
+.bentoContainer[data-count="4"] .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.bentoContainer[data-count="4"] .bentoItem:nth-child(2) { grid-column: span 2; grid-row: span 1; }
+.bentoContainer[data-count="4"] .bentoItem:nth-child(3) { grid-column: span 1; grid-row: span 1; }
+.bentoContainer[data-count="4"] .bentoItem:nth-child(4) { grid-column: span 1; grid-row: span 1; }
+
+.bentoContainer[data-count="5"] .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.bentoContainer[data-count="5"] .bentoItem:nth-child(2) { grid-column: span 2; grid-row: span 1; }
+.bentoContainer[data-count="5"] .bentoItem:nth-child(3) { grid-column: span 1; grid-row: span 1; }
+.bentoContainer[data-count="5"] .bentoItem:nth-child(4) { grid-column: span 1; grid-row: span 1; }
+.bentoContainer[data-count="5"] .bentoItem:nth-child(5) { grid-column: span 4; grid-row: span 1; }
+
 @media (max-width: 1024px) {
   .bentoContainer {
     grid-template-columns: repeat(2, 1fr);
   }
-  .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 1; }
-  .bentoItem:nth-child(2) { grid-column: span 1; grid-row: span 1; }
-  .bentoItem:nth-child(3) { grid-column: span 1; grid-row: span 1; }
-  .bentoItem:nth-child(4) { grid-column: span 2; grid-row: span 1; }
-  .bentoItem:nth-child(5) { grid-column: span 2; grid-row: span 1; }
+  .bentoContainer[data-count] .bentoItem { grid-column: span 1; grid-row: span 1; } /* reset */
+  .bentoContainer[data-count="1"] .bentoItem { grid-column: span 2; grid-row: span 1; }
+  .bentoContainer[data-count="2"] .bentoItem { grid-column: span 1; grid-row: span 1; }
+  .bentoContainer[data-count="3"] .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+  .bentoContainer[data-count="4"] .bentoItem { grid-column: span 1; grid-row: span 1; }
+  .bentoContainer[data-count="5"] .bentoItem:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+  .bentoContainer[data-count="5"] .bentoItem:nth-child(4) { grid-column: span 2; grid-row: span 1; }
+  .bentoContainer[data-count="5"] .bentoItem:nth-child(5) { grid-column: span 2; grid-row: span 1; }
 }
 
 @media (max-width: 640px) {

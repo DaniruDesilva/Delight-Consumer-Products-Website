@@ -24,7 +24,7 @@ export async function GET() {
       const product = db.instance
         .prepare('SELECT image FROM products WHERE category = ? AND status = ? LIMIT 1')
         .get(cat.category, 'active') as { image: string } | undefined;
-      image = product?.image || '/incense.png';
+      image = product?.image || 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477142/delight_static/l3phgjchpgvmuxhdakp2.png';
     }
     return {
       name: cat.category,

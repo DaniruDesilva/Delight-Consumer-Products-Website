@@ -41,8 +41,7 @@ export default function Sidebar({ collapsed, onToggle, onLogout, adminUser }: Si
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
-    if (href === '/admin/settings') return pathname === '/admin/settings';
-    return pathname.startsWith(href);
+    return pathname === href || pathname.startsWith(href + '/');
   };
 
   const navItems = ALL_NAV_ITEMS.filter(item => {

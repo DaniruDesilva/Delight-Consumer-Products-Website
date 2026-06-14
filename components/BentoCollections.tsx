@@ -20,7 +20,7 @@ export default function BentoCollections({ categories }: BentoCollectionsProps) 
   if (bentoItems.length === 0) return null;
 
   return (
-    <div className={styles.bentoContainer}>
+    <div className={styles.bentoContainer} data-count={bentoItems.length}>
       {bentoItems.map((cat, i) => (
         <Link 
           key={i} 
