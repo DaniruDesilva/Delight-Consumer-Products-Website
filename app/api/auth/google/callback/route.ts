@@ -5,8 +5,8 @@ import { createToken, setUserSessionCookie } from '@/lib/auth';
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const redirectUri = `${baseUrl}/api/auth/google/callback`;
+  const origin = url.origin;
+  const redirectUri = `${origin}/api/auth/google/callback`;
 
   if (!code) {
     return NextResponse.redirect(new URL('/?login_error=missing_code', request.url));

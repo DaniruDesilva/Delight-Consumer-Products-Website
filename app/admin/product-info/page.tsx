@@ -117,8 +117,11 @@ export default function ProductInfoPage() {
                 </div>
               </div>
               <div className={`${styles.formGroup} ${styles.full}`}>
-                <label>Detail Page Content (HTML)</label>
-                <textarea className={styles.input} rows={8} value={editing.detail_content} onChange={e => setEditing({ ...editing, detail_content: e.target.value })} placeholder="<h2>Section</h2><p>Content...</p>" />
+                <label>Detail Page Content (Text/Markdown)</label>
+                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8, marginTop: -4 }}>
+                  Use <b>##</b> for headings, <b>**text**</b> for bold, <b>&gt;</b> for quotes, and <b>-</b> for bullet points. No HTML needed!
+                </div>
+                <textarea className={styles.input} rows={12} value={editing.detail_content} onChange={e => setEditing({ ...editing, detail_content: e.target.value })} placeholder="## The Art of Incense Making&#10;&#10;Our incense sticks are handcrafted using a blend of natural resins, essential oils, and aromatic herbs...&#10;&#10;## What We Use&#10;&#10;- Premium sandalwood&#10;- Natural bamboo sticks&#10;- Essential oils" style={{ fontFamily: 'monospace' }} />
               </div>
               <div className={styles.formGroup}>
                 <label>Status</label>

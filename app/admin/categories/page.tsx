@@ -155,6 +155,9 @@ export default function CategoriesPage() {
                   {uploading === cat ? <Loader2 className={styles.spin} size={16} /> : <Upload size={16} />}
                   {uploading === cat ? 'Uploading...' : 'Set Cover Image'}
                 </button>
+                <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', color: '#6b7280' }}>
+                  Recommended: 1200 x 800px (will be cropped to fit)
+                </div>
               </div>
             </div>
           </div>

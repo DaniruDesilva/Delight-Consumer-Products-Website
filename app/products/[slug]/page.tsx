@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,6 +12,63 @@ import { BASE_URL, articleSchema, breadcrumbSchema } from '@/lib/seo';
 interface ProductInfoCard {
   id: number; title: string; subtitle: string; description: string;
   image: string; slug: string; detail_content: string; detail_image: string;
+}
+
+// ─── Simple Markdown Parser ───────────────────────────────────────────────────
+function parseInline(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
+function parseMarkdown(text: string): React.ReactNode {
+  if (!text) return <p>Detailed information coming soon.</p>;
+  
+  // Quick pre-processing for lists to group them
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  
+  let inList = false;
+  let listItems: React.ReactNode[] = [];
+
+  const pushList = () => {
+    if (inList && listItems.length > 0) {
+      elements.push(<ul key={`ul-${elements.length}`}>{listItems}</ul>);
+      listItems = [];
+      inList = false;
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    line = line.trim();
+    if (line.startsWith('- ')) {
+      inList = true;
+      listItems.push(<li key={`li-${idx}`}>{parseInline(line.slice(2))}</li>);
+    } else {
+      pushList();
+      if (!line) {
+        elements.push(<br key={`br-${idx}`} />);
+      } else if (line.startsWith('## ')) {
+        elements.push(<h2 key={`h2-${idx}`}>{parseInline(line.slice(3))}</h2>);
+      } else if (line.startsWith('# ')) {
+        elements.push(<h1 key={`h1-${idx}`}>{parseInline(line.slice(2))}</h1>);
+      } else if (line.startsWith('> ')) {
+        elements.push(<blockquote key={`bq-${idx}`}>{parseInline(line.slice(2))}</blockquote>);
+      } else {
+        // Normal paragraph. If it's the very first text paragraph, we can add a custom class for drop-cap.
+        const isFirstPara = elements.filter(e => React.isValidElement(e) && e.type === 'p').length === 0;
+        elements.push(<p key={`p-${idx}`} className={isFirstPara ? styles.firstParagraph : ''}>{parseInline(line)}</p>);
+      }
+    }
+  });
+  
+  pushList();
+  
+  return elements;
 }
 
 // ─── Dynamic Metadata ─────────────────────────────────────────────────────────
@@ -93,7 +151,9 @@ export default async function ProductInfoPage({ params }: { params: Promise<{ sl
           <div className="container">
             <div className={styles.contentGrid}>
               <ScrollReveal delay={0.2}>
-                <div className={styles.richText} dangerouslySetInnerHTML={{ __html: card.detail_content || '<p>Detailed information coming soon.</p>' }} />
+                <div className={styles.richText}>
+                  {parseMarkdown(card.detail_content)}
+                </div>
               </ScrollReveal>
 
               {card.detail_image && (
