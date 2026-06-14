@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserSession } from '@/lib/auth';
+import { sendEmail } from '@/lib/mailer';
+import { getReturnRequestUserTemplate } from '@/lib/email-templates';
 
 export async function POST(request: Request) {
   const session = await getUserSession();
@@ -35,6 +37,17 @@ export async function POST(request: Request) {
       details,
       image_url
     });
+
+    // Send confirmation email
+    try {
+      await sendEmail({
+        to: order.customer_email,
+        subject: `Return Request Received: ${order_number}`,
+        html: getReturnRequestUserTemplate(order_number, order.customer_name)
+      });
+    } catch (emailErr) {
+      console.error('Return request email failed:', emailErr);
+    }
 
     return NextResponse.json({ success: true, message: 'Return request submitted successfully.' });
   } catch (error) {

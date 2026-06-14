@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { hashPassword, createToken, setUserSessionCookie } from '@/lib/auth';
 
 import { sendEmail } from '@/lib/mailer';
+import { getWelcomeEmailTemplate } from '@/lib/email-templates';
 
 export async function POST(request: Request) {
   try {
@@ -37,21 +38,16 @@ export async function POST(request: Request) {
     const token = await createToken({ id: userId, email, role: 'user' });
     await setUserSessionCookie(token);
 
-    // Send Welcome Email
-    await sendEmail({
-      to: email,
-      subject: 'Welcome to Delight Consumer Products',
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-          <h2>Welcome to Delight, ${name}!</h2>
-          <p>Thank you for creating an account with us. We're thrilled to have you here.</p>
-          <p>You can now explore our premium range of aromatic products, track your orders, and enjoy faster checkout.</p>
-          <br/>
-          <p>Best Regards,</p>
-          <p><strong>The Delight Team</strong></p>
-        </div>
-      `,
-    });
+    // Send Welcome Email (don't let email failure crash registration)
+    try {
+      await sendEmail({
+        to: email,
+        subject: 'Welcome to Delight Consumer Products',
+        html: getWelcomeEmailTemplate(name),
+      });
+    } catch (emailErr) {
+      console.error('Welcome email failed:', emailErr);
+    }
 
     return NextResponse.json({ success: true, user: { id: userId, name, email } }, { status: 201 });
   } catch (err) {

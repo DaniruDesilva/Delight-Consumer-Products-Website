@@ -166,23 +166,22 @@ export async function POST(request: Request) {
 
     const customerEmail = email || user?.email || '';
     if (customerEmail) {
-      const { sendEmail } = require('@/lib/mailer');
-      const emailHtml = `
-        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-          <h2>Order Confirmation: ${orderNumber}</h2>
-          <p>Hi ${customerName},</p>
-          <p>Thank you for your purchase! We've received your order and are getting it ready.</p>
-          <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Total Amount:</strong> LKR ${total.toFixed(2)}</p>
-            <p><strong>Payment Method:</strong> ${payment_method === 'cod' ? 'Cash on Delivery' : payment_method === 'payhere' ? 'PayHere Secure Checkout' : 'Bank Transfer'}</p>
+      try {
+        const { sendEmail } = require('@/lib/mailer');
+        const { getOrderConfirmationTemplate } = require('@/lib/email-templates');
+        
+        const itemsListHtml = finalCartItems.map(item => `
+          <div style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+            <p style="margin: 0;"><strong>${item.name}</strong> x ${item.quantity}</p>
+            <p style="margin: 0; color: #666; font-size: 14px;">LKR ${(item.price * item.quantity).toFixed(2)}</p>
           </div>
-          <p>We'll notify you once it ships.</p>
-          <p>Best,</p>
-          <p><strong>The Delight Team</strong></p>
-        </div>
-      `;
-      // Run asynchronously without awaiting so we don't delay the response
-      sendEmail({ to: customerEmail, subject: `Order Confirmed: ${orderNumber}`, html: emailHtml }).catch(console.error);
+        `).join('');
+
+        const emailHtml = getOrderConfirmationTemplate(orderNumber, customerName, total, payment_method, itemsListHtml);
+        await sendEmail({ to: customerEmail, subject: `Order Confirmed: ${orderNumber}`, html: emailHtml });
+      } catch (emailErr) {
+        console.error('Order confirmation email failed:', emailErr);
+      }
     }
 
     // Handle PayHere Logic

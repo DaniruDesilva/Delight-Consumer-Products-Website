@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { createToken, setUserSessionCookie } from '@/lib/auth';
+import { sendEmail } from '@/lib/mailer';
+import { getWelcomeEmailTemplate } from '@/lib/email-templates';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -80,6 +82,17 @@ export async function GET(request: Request) {
         email,
         role: 'user',
       };
+
+      // Send Welcome Email for new Google signups
+      try {
+        await sendEmail({
+          to: email,
+          subject: 'Welcome to Delight Consumer Products',
+          html: getWelcomeEmailTemplate(name),
+        });
+      } catch (emailErr) {
+        console.error('Google signup welcome email failed:', emailErr);
+      }
     }
 
     // 4. Create JWT Session

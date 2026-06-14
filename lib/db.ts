@@ -896,6 +896,15 @@ export const db = {
     return (getDb().prepare('SELECT COUNT(*) as count FROM users').get() as { count: number }).count;
   },
 
+  deleteUser(id: number) {
+    // Delete user's cart items
+    getDb().prepare('DELETE FROM cart_items WHERE user_id = ?').run(id);
+    // Delete wishlist items
+    getDb().prepare('DELETE FROM wishlist WHERE user_id = ?').run(id);
+    // Delete the user
+    return getDb().prepare('DELETE FROM users WHERE id = ?').run(id);
+  },
+
   // ─── Cart ───
   getCartItems(userId: number) {
     return getDb().prepare(`
