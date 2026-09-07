@@ -2,7 +2,12 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const origin = new URL(request.url).origin;
+  
+  // When running behind cPanel Passenger, request.url might be the internal node port.
+  // We must read the forwarded headers to construct the true external origin.
+  const protocol = request.headers.get('x-forwarded-proto') || 'https';
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'delightconsumerproducts.lk';
+  const origin = `${protocol}://${host}`;
   const redirectUri = `${origin}/api/auth/google/callback`;
 
   if (!clientId) {

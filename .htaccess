@@ -1,0 +1,6 @@
+# Force HTTPS (Highly recommended for SEO and Security)
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# cPanel will automatically inject the Passenger Node.js configuration below this line when you start the app.

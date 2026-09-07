@@ -7,18 +7,22 @@ import { getWelcomeEmailTemplate } from '@/lib/email-templates';
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const origin = url.origin;
+  
+  // Construct origin using forwarded headers for cPanel compatibility
+  const protocol = request.headers.get('x-forwarded-proto') || 'https';
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'delightconsumerproducts.lk';
+  const origin = `${protocol}://${host}`;
   const redirectUri = `${origin}/api/auth/google/callback`;
 
-  if (!code) {
-    return NextResponse.redirect(new URL('/?login_error=missing_code', request.url));
+    if (!code) {
+    return NextResponse.redirect(new URL('/?login_error=missing_code', origin));
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(new URL('/?login_error=missing_config', request.url));
+    return NextResponse.redirect(new URL('/?login_error=missing_config', origin));
   }
 
   try {
@@ -37,7 +41,7 @@ export async function GET(request: Request) {
 
     if (!tokenResponse.ok) {
       console.error('Google token error:', await tokenResponse.text());
-      return NextResponse.redirect(new URL('/?login_error=token_failed', request.url));
+      return NextResponse.redirect(new URL('/?login_error=token_failed', origin));
     }
 
     const tokenData = await tokenResponse.json();
@@ -49,7 +53,7 @@ export async function GET(request: Request) {
 
     if (!profileResponse.ok) {
       console.error('Google profile error:', await profileResponse.text());
-      return NextResponse.redirect(new URL('/?login_error=profile_failed', request.url));
+      return NextResponse.redirect(new URL('/?login_error=profile_failed', origin));
     }
 
     const profileData = await profileResponse.json();
@@ -58,7 +62,7 @@ export async function GET(request: Request) {
     const name = profileData.name;
 
     if (!email) {
-      return NextResponse.redirect(new URL('/?login_error=no_email', request.url));
+      return NextResponse.redirect(new URL('/?login_error=no_email', origin));
     }
 
     // 3. Find or Create User in DB
@@ -106,9 +110,9 @@ export async function GET(request: Request) {
     await setUserSessionCookie(token);
 
     // 5. Redirect back to homepage or account
-    return NextResponse.redirect(new URL('/account', request.url));
+    return NextResponse.redirect(new URL('/account', origin));
   } catch (error) {
     console.error('Google OAuth callback error:', error);
-    return NextResponse.redirect(new URL('/?login_error=internal_error', request.url));
+    return NextResponse.redirect(new URL('/?login_error=internal_error', origin));
   }
 }

@@ -254,6 +254,10 @@
   z-index: 3;
 }
 
+.mobileQuickAdd {
+  display: none;
+}
+
 .productCard:hover .quickAddWrap {
   opacity: 1;
   transform: translateY(0);
@@ -484,13 +488,18 @@
   }
   
   /* Quick Add overlay is tricky on mobile (no hover), show button statically or adjust */
-  .quickAddWrap {
+  .desktopQuickAdd {
+    display: none;
+  }
+  
+  .mobileQuickAdd {
+    display: block;
     opacity: 1;
     transform: translateY(0);
     position: relative;
     padding: 0 16px 16px;
     bottom: auto; left: auto; right: auto;
-    background: white;
+    background: transparent;
   }
   
   .addToCartBtn {

@@ -166,7 +166,7 @@ function ShopContent() {
                         {product.is_sale === 1 && <span className={styles.saleBadge}>SALE</span>}
                         
                         {/* Desktop Hover Quick Add */}
-                        <div className={styles.quickAddWrap}>
+                        <div className={`${styles.quickAddWrap} ${styles.desktopQuickAdd}`}>
                           <button 
                             className={`${styles.addToCartBtn} ${addedId === product.id ? styles.addedWait : ''}`} 
                             onClick={(e) => handleAddToCart(e, product.id)}
@@ -183,6 +183,16 @@ function ShopContent() {
                           <span className={styles.price}>Rs. {product.price.toLocaleString()}</span>
                           {product.original_price && <span className={styles.oldPrice}>Rs. {product.original_price.toLocaleString()}</span>}
                         </div>
+                      </div>
+
+                      {/* Mobile Quick Add */}
+                      <div className={`${styles.quickAddWrap} ${styles.mobileQuickAdd}`}>
+                        <button 
+                          className={`${styles.addToCartBtn} ${addedId === product.id ? styles.addedWait : ''}`} 
+                          onClick={(e) => handleAddToCart(e, product.id)}
+                        >
+                          {addedId === product.id ? 'Item Added!' : <><ShoppingCart size={16} /> Quick Add</>}
+                        </button>
                       </div>
                     </Link>
                   </ScrollReveal>

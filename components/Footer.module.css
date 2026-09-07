@@ -457,11 +457,13 @@ a.contactItem:hover .contactIcon {
   }
 
   .legalLinks {
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
   }
 
   .bullet {
-    display: none;
+    display: inline;
   }
 }
