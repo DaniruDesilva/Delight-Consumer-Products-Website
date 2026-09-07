@@ -8,6 +8,7 @@ import styles from '../admin.module.css';
 const PERMISSIONS = [
   { id: 'manage_products', label: 'Manage Products (Products, Brands, Info)' },
   { id: 'manage_orders', label: 'Manage Orders (Orders, Returns, Coupons)' },
+  { id: 'manage_sales', label: 'Manage Sales (Reps, Retailers, B2B Orders, Targets)' },
   { id: 'manage_content', label: 'Manage Content (Content, News, Slides, Media, FAQs)' },
   { id: 'manage_careers', label: 'Manage Careers (Jobs, Applications)' },
   { id: 'manage_customers', label: 'Manage Customers (Customers, Newsletter, Questions)' },
@@ -150,6 +151,15 @@ export default function AdminStaffPage() {
     });
   };
 
+  const formatRole = (role: string) => {
+    switch (role) {
+      case 'super_admin': return 'Super Admin';
+      case 'sales_manager': return 'Sales Manager';
+      case 'sales_rep': return 'Sales Rep';
+      default: return 'Admin';
+    }
+  };
+
   if (loading) return <div className={shared.loading}>Loading...</div>;
 
   return (
@@ -188,8 +198,8 @@ export default function AdminStaffPage() {
                     <td style={{ fontWeight: 600 }}>{admin.username}</td>
                     <td>{admin.email || '-'}</td>
                     <td>
-                      <span className={`${shared.badge} ${admin.admin_role === 'super_admin' ? shared.active : shared.processing}`}>
-                        {admin.admin_role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                      <span className={`${shared.badge} ${admin.admin_role === 'super_admin' ? shared.active : admin.admin_role === 'sales_manager' ? shared.blue : shared.processing}`}>
+                        {formatRole(admin.admin_role)}
                       </span>
                     </td>
                     <td>
@@ -268,6 +278,7 @@ export default function AdminStaffPage() {
                     onChange={e => setFormData({...formData, username: e.target.value})}
                     required
                     className={shared.input}
+                    disabled={!!editingAdmin}
                   />
                 </div>
                 <div className={shared.formGroup}>
@@ -303,14 +314,22 @@ export default function AdminStaffPage() {
                     value={formData.admin_role}
                     onChange={e => setFormData({...formData, admin_role: e.target.value})}
                     className={shared.input}
+                    disabled={formData.admin_role === 'sales_rep'}
                   >
                     <option value="admin">Admin</option>
+                    <option value="sales_manager">Sales Manager</option>
                     <option value="super_admin">Super Admin</option>
+                    {formData.admin_role === 'sales_rep' && <option value="sales_rep">Sales Rep</option>}
                   </select>
+                  {formData.admin_role === 'sales_rep' && (
+                    <small style={{ color: '#6b7280', display: 'block', marginTop: 4 }}>
+                      Manage sales reps from the Sales Reps page.
+                    </small>
+                  )}
                 </div>
               </div>
 
-              {formData.admin_role !== 'super_admin' && (
+              {formData.admin_role !== 'super_admin' && formData.admin_role !== 'sales_rep' && (
                 <div className={shared.formGroup} style={{ marginBottom: '20px' }}>
                   <label style={{ marginBottom: '10px', display: 'block' }}>Permissions</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', background: '#f9fafb', padding: '16px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
@@ -363,3 +382,4 @@ export default function AdminStaffPage() {
     </div>
   );
 }
+

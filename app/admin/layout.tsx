@@ -21,6 +21,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // Check admin session
     fetch('/api/auth/me').then(r => r.json()).then(data => {
       if (data.admin) {
+        if (data.admin.admin_role === 'sales_rep') {
+          router.replace('/sales');
+          return;
+        }
         setAdminUser(data.admin);
         setAuthed(true);
       } else {

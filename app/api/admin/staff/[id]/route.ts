@@ -60,7 +60,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     db.updateAdmin(id, {
       username: username || targetAdmin.username,
       email: email || targetAdmin.email,
-      admin_role: admin_role === 'super_admin' ? 'super_admin' : 'admin',
+      admin_role: ['super_admin', 'sales_manager', 'sales_rep'].includes(admin_role) ? admin_role : 'admin',
       permissions: perms,
       is_active: is_active !== undefined ? (is_active ? 1 : 0) : targetAdmin.is_active
     });

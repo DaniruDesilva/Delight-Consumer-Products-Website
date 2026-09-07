@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       username,
       email: email || '',
       password_hash,
-      admin_role: admin_role === 'super_admin' ? 'super_admin' : 'admin',
+      admin_role: ['super_admin', 'sales_manager'].includes(admin_role) ? admin_role : 'admin',
       permissions: perms
     });
 

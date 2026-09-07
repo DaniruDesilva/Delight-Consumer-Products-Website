@@ -10,11 +10,13 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 export default function SiteWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith('/admin');
+  const isSales = pathname.startsWith('/sales');
+  const isDashboard = isAdmin || isSales;
 
   return (
     <>
       {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
-      {isAdmin ? (
+      {isDashboard ? (
         <>{children}</>
       ) : (
         <>

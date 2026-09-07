@@ -5,6 +5,9 @@ import { cookies } from 'next/headers';
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'delight-admin-secret-key-2026');
 const ADMIN_COOKIE = 'delight_admin_session';
 const USER_COOKIE = 'delight_user_session';
+const SALES_COOKIE = 'delight_sales_session';
+
+export type AdminRole = 'super_admin' | 'admin' | 'sales_manager' | 'sales_rep';
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
@@ -14,7 +17,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
-export async function createToken(payload: { id: number; username?: string; email?: string; role: 'admin' | 'user'; admin_role?: string; permissions?: string[] }): Promise<string> {
+export async function createToken(payload: { id: number; username?: string; email?: string; role: 'admin' | 'user' | 'sales_rep'; admin_role?: AdminRole; permissions?: string[]; sales_rep_id?: number }): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -25,7 +28,7 @@ export async function createToken(payload: { id: number; username?: string; emai
 export async function verifyToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as { id: number; username?: string; email?: string; role: 'admin' | 'user'; admin_role?: string; permissions?: string[] };
+    return payload as { id: number; username?: string; email?: string; role: 'admin' | 'user' | 'sales_rep'; admin_role?: AdminRole; permissions?: string[]; sales_rep_id?: number };
   } catch {
     return null;
   }
@@ -85,4 +88,31 @@ export async function clearUserSessionCookie() {
   cookieStore.delete(USER_COOKIE);
 }
 
-export { ADMIN_COOKIE, USER_COOKIE };
+// Sales Rep session
+export async function getSalesRepSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SALES_COOKIE)?.value;
+  if (!token) return null;
+  const payload = await verifyToken(token);
+  if (!payload || payload.role !== 'sales_rep') return null;
+  return payload;
+}
+
+export async function setSalesRepSessionCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(SALES_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24, // 1 day
+    path: '/',
+  });
+}
+
+export async function clearSalesRepSessionCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete(SALES_COOKIE);
+}
+
+export { ADMIN_COOKIE, USER_COOKIE, SALES_COOKIE };
+

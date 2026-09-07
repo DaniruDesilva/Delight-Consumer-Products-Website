@@ -433,6 +433,150 @@ function initTables(db: Database.Database) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- ═══ Sales Management System Tables ═══
+
+    CREATE TABLE IF NOT EXISTS sales_reps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      admin_id INTEGER UNIQUE NOT NULL,
+      employee_code TEXT UNIQUE NOT NULL,
+      full_name TEXT NOT NULL,
+      phone TEXT DEFAULT '',
+      territory TEXT DEFAULT '',
+      base_salary REAL DEFAULT 0,
+      max_discount_percent REAL DEFAULT 5,
+      status TEXT DEFAULT 'active',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS retailers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      shop_name TEXT NOT NULL,
+      owner_name TEXT NOT NULL,
+      phone TEXT DEFAULT '',
+      address TEXT DEFAULT '',
+      city TEXT DEFAULT '',
+      district TEXT DEFAULT '',
+      gps_lat REAL DEFAULT NULL,
+      gps_lng REAL DEFAULT NULL,
+      sales_rep_id INTEGER,
+      territory TEXT DEFAULT '',
+      shop_type TEXT DEFAULT 'Grocery',
+      payment_type TEXT DEFAULT 'cash',
+      credit_limit REAL DEFAULT 0,
+      payment_terms INTEGER DEFAULT 0,
+      status TEXT DEFAULT 'active',
+      registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      last_order_at DATETIME DEFAULT NULL,
+      total_sales REAL DEFAULT 0,
+      outstanding_balance REAL DEFAULT 0,
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS sales_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_number TEXT UNIQUE NOT NULL,
+      sales_rep_id INTEGER NOT NULL,
+      retailer_id INTEGER NOT NULL,
+      items_json TEXT DEFAULT '[]',
+      subtotal REAL DEFAULT 0,
+      discount_total REAL DEFAULT 0,
+      total REAL DEFAULT 0,
+      payment_method TEXT DEFAULT 'cash',
+      status TEXT DEFAULT 'pending',
+      requires_approval INTEGER DEFAULT 0,
+      approval_status TEXT DEFAULT NULL,
+      approved_by INTEGER DEFAULT NULL,
+      notes TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      delivered_at DATETIME DEFAULT NULL,
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id),
+      FOREIGN KEY (retailer_id) REFERENCES retailers(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS collections (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_rep_id INTEGER NOT NULL,
+      retailer_id INTEGER NOT NULL,
+      amount REAL NOT NULL,
+      payment_method TEXT DEFAULT 'cash',
+      reference_number TEXT DEFAULT '',
+      notes TEXT DEFAULT '',
+      collected_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id),
+      FOREIGN KEY (retailer_id) REFERENCES retailers(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS sales_targets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_rep_id INTEGER NOT NULL,
+      target_month TEXT NOT NULL,
+      target_amount REAL NOT NULL,
+      territory TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(sales_rep_id, target_month),
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS commission_tiers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      min_sales REAL NOT NULL,
+      max_sales REAL DEFAULT NULL,
+      rate_percent REAL NOT NULL,
+      effective_from DATE DEFAULT CURRENT_TIMESTAMP,
+      is_active INTEGER DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS commission_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_rep_id INTEGER NOT NULL,
+      month TEXT NOT NULL,
+      total_sales REAL DEFAULT 0,
+      eligible_sales REAL DEFAULT 0,
+      commission_rate REAL DEFAULT 0,
+      commission_amount REAL DEFAULT 0,
+      new_retailer_bonus REAL DEFAULT 0,
+      target_bonus REAL DEFAULT 0,
+      total_earning REAL DEFAULT 0,
+      status TEXT DEFAULT 'pending',
+      calculated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(sales_rep_id, month),
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS daily_reports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_rep_id INTEGER NOT NULL,
+      report_date DATE NOT NULL,
+      territory TEXT DEFAULT '',
+      shops_planned INTEGER DEFAULT 0,
+      shops_visited INTEGER DEFAULT 0,
+      orders_count INTEGER DEFAULT 0,
+      new_retailers INTEGER DEFAULT 0,
+      total_sales REAL DEFAULT 0,
+      total_collections REAL DEFAULT 0,
+      new_leads INTEGER DEFAULT 0,
+      problems TEXT DEFAULT '',
+      market_feedback TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(sales_rep_id, report_date),
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS discount_approvals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_order_id INTEGER NOT NULL,
+      sales_rep_id INTEGER NOT NULL,
+      requested_discount REAL NOT NULL,
+      allowed_discount REAL NOT NULL,
+      status TEXT DEFAULT 'pending',
+      reviewed_by INTEGER DEFAULT NULL,
+      reviewed_at DATETIME DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (sales_order_id) REFERENCES sales_orders(id),
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id)
+    );
   `);
 
   // Migration: add columns to orders if missing
@@ -471,6 +615,13 @@ function initTables(db: Database.Database) {
 
   // Migration: add google_id to users
   try { db.exec("ALTER TABLE users ADD COLUMN google_id TEXT DEFAULT NULL"); } catch {}
+
+  // Migration: add B2B pricing columns to products
+  try { db.exec('ALTER TABLE products ADD COLUMN sku TEXT DEFAULT NULL'); } catch {}
+  try { db.exec('ALTER TABLE products ADD COLUMN cost_price REAL DEFAULT NULL'); } catch {}
+  try { db.exec('ALTER TABLE products ADD COLUMN retailer_price REAL DEFAULT NULL'); } catch {}
+  try { db.exec('ALTER TABLE products ADD COLUMN commission_eligible INTEGER DEFAULT 1'); } catch {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN shipping_zip TEXT DEFAULT ""'); } catch {}
 
   // Seed default admin if none exists
   const adminCount = db.prepare('SELECT COUNT(*) as count FROM admins').get() as { count: number };
@@ -671,6 +822,22 @@ function initTables(db: Database.Database) {
     ];
     const stmt = db.prepare('INSERT INTO product_info_cards (title, subtitle, description, image, slug, detail_content, sort_order) VALUES (?,?,?,?,?,?,?)');
     cards.forEach((c, i) => stmt.run(c.title, c.subtitle, c.description, c.image, c.slug, c.detail_content, i));
+  }
+
+  // Seed default commission tiers if none exist
+  const commTierCount = db.prepare('SELECT COUNT(*) as count FROM commission_tiers').get() as { count: number };
+  if (commTierCount.count === 0) {
+    const tiers = [
+      { min: 0, max: 199999, rate: 0 },
+      { min: 200000, max: 299999, rate: 1 },
+      { min: 300000, max: 399999, rate: 1.5 },
+      { min: 400000, max: 499999, rate: 2 },
+      { min: 500000, max: null, rate: 2.5 },
+    ];
+    const tierStmt = db.prepare('INSERT INTO commission_tiers (min_sales, max_sales, rate_percent) VALUES (?,?,?)');
+    for (const t of tiers) {
+      tierStmt.run(t.min, t.max, t.rate);
+    }
   }
 }
 
@@ -1329,5 +1496,236 @@ export const db = {
 
   getOrderByNumber(orderNumber: string) {
     return getDb().prepare('SELECT * FROM orders WHERE order_number = ?').get(orderNumber) as any;
+  },
+
+  // ═══════════════════════════════════════════════════
+  // ═══ Sales Management System Query Helpers ═══
+  // ═══════════════════════════════════════════════════
+
+  // ─── Sales Representatives ───
+  getSalesReps(opts?: { status?: string }) {
+    let query = 'SELECT sr.*, a.username, a.email, a.is_active as admin_active FROM sales_reps sr JOIN admins a ON sr.admin_id = a.id';
+    const params: unknown[] = [];
+    if (opts?.status) { query += ' WHERE sr.status = ?'; params.push(opts.status); }
+    query += ' ORDER BY sr.created_at DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  getSalesRepById(id: number) {
+    return getDb().prepare('SELECT sr.*, a.username, a.email, a.is_active as admin_active FROM sales_reps sr JOIN admins a ON sr.admin_id = a.id WHERE sr.id = ?').get(id) as any;
+  },
+
+  getSalesRepByAdminId(adminId: number) {
+    return getDb().prepare('SELECT sr.*, a.username, a.email, a.is_active as admin_active FROM sales_reps sr JOIN admins a ON sr.admin_id = a.id WHERE sr.admin_id = ?').get(adminId) as any;
+  },
+
+  createSalesRep(data: { admin_id: number; employee_code: string; full_name: string; phone?: string; territory?: string; base_salary?: number; max_discount_percent?: number }) {
+    return getDb().prepare('INSERT INTO sales_reps (admin_id, employee_code, full_name, phone, territory, base_salary, max_discount_percent) VALUES (?,?,?,?,?,?,?)').run(
+      data.admin_id, data.employee_code, data.full_name, data.phone || '', data.territory || '', data.base_salary || 0, data.max_discount_percent !== undefined ? data.max_discount_percent : 5
+    );
+  },
+
+  updateSalesRep(id: number, data: { full_name?: string; phone?: string; territory?: string; base_salary?: number; max_discount_percent?: number; status?: string; employee_code?: string }) {
+    const fields: string[] = [];
+    const params: unknown[] = [];
+    if (data.full_name !== undefined) { fields.push('full_name = ?'); params.push(data.full_name); }
+    if (data.phone !== undefined) { fields.push('phone = ?'); params.push(data.phone); }
+    if (data.territory !== undefined) { fields.push('territory = ?'); params.push(data.territory); }
+    if (data.base_salary !== undefined) { fields.push('base_salary = ?'); params.push(data.base_salary); }
+    if (data.max_discount_percent !== undefined) { fields.push('max_discount_percent = ?'); params.push(data.max_discount_percent); }
+    if (data.status !== undefined) { fields.push('status = ?'); params.push(data.status); }
+    if (data.employee_code !== undefined) { fields.push('employee_code = ?'); params.push(data.employee_code); }
+    if (fields.length === 0) return;
+    params.push(id);
+    return getDb().prepare(`UPDATE sales_reps SET ${fields.join(', ')} WHERE id = ?`).run(...params);
+  },
+
+  getNextEmployeeCode() {
+    const last = getDb().prepare("SELECT employee_code FROM sales_reps ORDER BY id DESC LIMIT 1").get() as { employee_code: string } | undefined;
+    if (!last) return 'SR001';
+    const num = parseInt(last.employee_code.replace('SR', '')) || 0;
+    return `SR${String(num + 1).padStart(3, '0')}`;
+  },
+
+  getSalesRepStats(repId: number) {
+    const totalSales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE sales_rep_id = ? AND status NOT IN ('cancelled', 'rejected')").get(repId) as any)?.total || 0;
+    const monthlySales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE sales_rep_id = ? AND status NOT IN ('cancelled', 'rejected') AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')").get(repId) as any)?.total || 0;
+    const todaySales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE sales_rep_id = ? AND status NOT IN ('cancelled', 'rejected') AND date(created_at) = date('now')").get(repId) as any)?.total || 0;
+    const activeRetailers = (getDb().prepare("SELECT COUNT(*) as count FROM retailers WHERE sales_rep_id = ? AND status = 'active'").get(repId) as any)?.count || 0;
+    const totalCollections = (getDb().prepare("SELECT COALESCE(SUM(amount), 0) as total FROM collections WHERE sales_rep_id = ? AND strftime('%Y-%m', collected_at) = strftime('%Y-%m', 'now')").get(repId) as any)?.total || 0;
+    const orderCount = (getDb().prepare("SELECT COUNT(*) as count FROM sales_orders WHERE sales_rep_id = ? AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')").get(repId) as any)?.count || 0;
+    return { totalSales, monthlySales, todaySales, activeRetailers, totalCollections, orderCount };
+  },
+
+  // ─── Retailers ───
+  getRetailers(opts?: { sales_rep_id?: number; district?: string; status?: string; shop_type?: string; search?: string }) {
+    let query = 'SELECT r.*, sr.full_name as rep_name, sr.employee_code as rep_code FROM retailers r LEFT JOIN sales_reps sr ON r.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND r.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.district) { query += ' AND r.district = ?'; params.push(opts.district); }
+    if (opts?.status) { query += ' AND r.status = ?'; params.push(opts.status); }
+    if (opts?.shop_type) { query += ' AND r.shop_type = ?'; params.push(opts.shop_type); }
+    if (opts?.search) { query += ' AND (r.shop_name LIKE ? OR r.owner_name LIKE ?)'; params.push(`%${opts.search}%`, `%${opts.search}%`); }
+    query += ' ORDER BY r.registered_at DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  getRetailerById(id: number) {
+    return getDb().prepare('SELECT r.*, sr.full_name as rep_name, sr.employee_code as rep_code FROM retailers r LEFT JOIN sales_reps sr ON r.sales_rep_id = sr.id WHERE r.id = ?').get(id) as any;
+  },
+
+  createRetailer(data: { shop_name: string; owner_name: string; phone?: string; address?: string; city?: string; district?: string; sales_rep_id?: number; territory?: string; shop_type?: string; payment_type?: string; credit_limit?: number; payment_terms?: number }) {
+    return getDb().prepare('INSERT INTO retailers (shop_name, owner_name, phone, address, city, district, sales_rep_id, territory, shop_type, payment_type, credit_limit, payment_terms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').run(
+      data.shop_name, data.owner_name, data.phone || '', data.address || '', data.city || '', data.district || '', data.sales_rep_id || null, data.territory || '', data.shop_type || 'Grocery', data.payment_type || 'cash', data.credit_limit || 0, data.payment_terms || 0
+    );
+  },
+
+  updateRetailer(id: number, data: Record<string, unknown>) {
+    const fields: string[] = [];
+    const params: unknown[] = [];
+    const allowed = ['shop_name', 'owner_name', 'phone', 'address', 'city', 'district', 'sales_rep_id', 'territory', 'shop_type', 'payment_type', 'credit_limit', 'payment_terms', 'status', 'gps_lat', 'gps_lng'];
+    for (const key of allowed) {
+      if (data[key] !== undefined) { fields.push(`${key} = ?`); params.push(data[key]); }
+    }
+    if (fields.length === 0) return;
+    params.push(id);
+    return getDb().prepare(`UPDATE retailers SET ${fields.join(', ')} WHERE id = ?`).run(...params);
+  },
+
+  updateRetailerSalesStats(retailerId: number) {
+    // Recalculate total_sales and outstanding_balance from orders and collections
+    const totalSales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE retailer_id = ? AND status NOT IN ('cancelled', 'rejected')").get(retailerId) as any)?.total || 0;
+    const totalCollected = (getDb().prepare('SELECT COALESCE(SUM(amount), 0) as total FROM collections WHERE retailer_id = ?').get(retailerId) as any)?.total || 0;
+    const lastOrder = (getDb().prepare("SELECT created_at FROM sales_orders WHERE retailer_id = ? AND status NOT IN ('cancelled', 'rejected') ORDER BY created_at DESC LIMIT 1").get(retailerId) as any)?.created_at || null;
+    getDb().prepare('UPDATE retailers SET total_sales = ?, outstanding_balance = ?, last_order_at = ? WHERE id = ?').run(totalSales, totalSales - totalCollected, lastOrder, retailerId);
+  },
+
+  // ─── Sales Orders ───
+  getSalesOrders(opts?: { sales_rep_id?: number; retailer_id?: number; status?: string; date_from?: string; date_to?: string }) {
+    let query = 'SELECT so.*, r.shop_name as retailer_name, sr.full_name as rep_name, sr.employee_code as rep_code FROM sales_orders so JOIN retailers r ON so.retailer_id = r.id JOIN sales_reps sr ON so.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND so.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.retailer_id) { query += ' AND so.retailer_id = ?'; params.push(opts.retailer_id); }
+    if (opts?.status) { query += ' AND so.status = ?'; params.push(opts.status); }
+    if (opts?.date_from) { query += ' AND date(so.created_at) >= ?'; params.push(opts.date_from); }
+    if (opts?.date_to) { query += ' AND date(so.created_at) <= ?'; params.push(opts.date_to); }
+    query += ' ORDER BY so.created_at DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  getSalesOrderById(id: number) {
+    return getDb().prepare('SELECT so.*, r.shop_name as retailer_name, r.owner_name as retailer_owner, r.phone as retailer_phone, sr.full_name as rep_name, sr.employee_code as rep_code FROM sales_orders so JOIN retailers r ON so.retailer_id = r.id JOIN sales_reps sr ON so.sales_rep_id = sr.id WHERE so.id = ?').get(id) as any;
+  },
+
+  createSalesOrder(data: { order_number: string; sales_rep_id: number; retailer_id: number; items_json: string; subtotal: number; discount_total: number; total: number; payment_method: string; requires_approval?: number; notes?: string; status?: string }) {
+    return getDb().prepare('INSERT INTO sales_orders (order_number, sales_rep_id, retailer_id, items_json, subtotal, discount_total, total, payment_method, requires_approval, notes, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)').run(
+      data.order_number, data.sales_rep_id, data.retailer_id, data.items_json, data.subtotal, data.discount_total, data.total, data.payment_method, data.requires_approval || 0, data.notes || '', data.status || 'pending'
+    );
+  },
+
+  updateSalesOrderStatus(id: number, status: string, approvedBy?: number) {
+    if (approvedBy !== undefined) {
+      return getDb().prepare('UPDATE sales_orders SET status = ?, approval_status = ?, approved_by = ?, delivered_at = CASE WHEN ? = \'delivered\' THEN CURRENT_TIMESTAMP ELSE delivered_at END WHERE id = ?').run(status, status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : null, approvedBy, status, id);
+    }
+    return getDb().prepare('UPDATE sales_orders SET status = ?, delivered_at = CASE WHEN ? = \'delivered\' THEN CURRENT_TIMESTAMP ELSE delivered_at END WHERE id = ?').run(status, status, id);
+  },
+
+  getNextSalesOrderNumber() {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const last = getDb().prepare(`SELECT order_number FROM sales_orders WHERE order_number LIKE 'SO-${today}-%' ORDER BY id DESC LIMIT 1`).get() as { order_number: string } | undefined;
+    if (!last) return `SO-${today}-001`;
+    const num = parseInt(last.order_number.split('-').pop() || '0') || 0;
+    return `SO-${today}-${String(num + 1).padStart(3, '0')}`;
+  },
+
+  // ─── Collections ───
+  getCollections(opts?: { sales_rep_id?: number; retailer_id?: number; date_from?: string; date_to?: string }) {
+    let query = 'SELECT c.*, r.shop_name as retailer_name, sr.full_name as rep_name, sr.employee_code as rep_code FROM collections c JOIN retailers r ON c.retailer_id = r.id JOIN sales_reps sr ON c.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND c.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.retailer_id) { query += ' AND c.retailer_id = ?'; params.push(opts.retailer_id); }
+    if (opts?.date_from) { query += ' AND date(c.collected_at) >= ?'; params.push(opts.date_from); }
+    if (opts?.date_to) { query += ' AND date(c.collected_at) <= ?'; params.push(opts.date_to); }
+    query += ' ORDER BY c.collected_at DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  createCollection(data: { sales_rep_id: number; retailer_id: number; amount: number; payment_method?: string; reference_number?: string; notes?: string }) {
+    const result = getDb().prepare('INSERT INTO collections (sales_rep_id, retailer_id, amount, payment_method, reference_number, notes) VALUES (?,?,?,?,?,?)').run(
+      data.sales_rep_id, data.retailer_id, data.amount, data.payment_method || 'cash', data.reference_number || '', data.notes || ''
+    );
+    // Update retailer outstanding balance
+    this.updateRetailerSalesStats(data.retailer_id);
+    return result;
+  },
+
+  // ─── Sales Targets ───
+  getSalesTargets(opts?: { sales_rep_id?: number; month?: string }) {
+    let query = 'SELECT st.*, sr.full_name as rep_name, sr.employee_code as rep_code FROM sales_targets st JOIN sales_reps sr ON st.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND st.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.month) { query += ' AND st.target_month = ?'; params.push(opts.month); }
+    query += ' ORDER BY st.target_month DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  upsertSalesTarget(data: { sales_rep_id: number; target_month: string; target_amount: number; territory?: string }) {
+    const existing = getDb().prepare('SELECT id FROM sales_targets WHERE sales_rep_id = ? AND target_month = ?').get(data.sales_rep_id, data.target_month);
+    if (existing) {
+      return getDb().prepare('UPDATE sales_targets SET target_amount = ?, territory = ? WHERE sales_rep_id = ? AND target_month = ?').run(data.target_amount, data.territory || '', data.sales_rep_id, data.target_month);
+    }
+    return getDb().prepare('INSERT INTO sales_targets (sales_rep_id, target_month, target_amount, territory) VALUES (?,?,?,?)').run(data.sales_rep_id, data.target_month, data.target_amount, data.territory || '');
+  },
+
+  // ─── Commission Tiers ───
+  getCommissionTiers() {
+    return getDb().prepare('SELECT * FROM commission_tiers WHERE is_active = 1 ORDER BY min_sales ASC').all();
+  },
+
+  // ─── Commission Records ───
+  getCommissionRecords(opts?: { sales_rep_id?: number; month?: string }) {
+    let query = 'SELECT cr.*, sr.full_name as rep_name, sr.employee_code as rep_code FROM commission_records cr JOIN sales_reps sr ON cr.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND cr.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.month) { query += ' AND cr.month = ?'; params.push(opts.month); }
+    query += ' ORDER BY cr.month DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  // ─── Daily Reports ───
+  getDailyReports(opts?: { sales_rep_id?: number; date_from?: string; date_to?: string }) {
+    let query = 'SELECT dr.*, sr.full_name as rep_name, sr.employee_code as rep_code FROM daily_reports dr JOIN sales_reps sr ON dr.sales_rep_id = sr.id WHERE 1=1';
+    const params: unknown[] = [];
+    if (opts?.sales_rep_id) { query += ' AND dr.sales_rep_id = ?'; params.push(opts.sales_rep_id); }
+    if (opts?.date_from) { query += ' AND dr.report_date >= ?'; params.push(opts.date_from); }
+    if (opts?.date_to) { query += ' AND dr.report_date <= ?'; params.push(opts.date_to); }
+    query += ' ORDER BY dr.report_date DESC';
+    return getDb().prepare(query).all(...params);
+  },
+
+  createDailyReport(data: { sales_rep_id: number; report_date: string; territory?: string; shops_planned?: number; shops_visited?: number; orders_count?: number; new_retailers?: number; total_sales?: number; total_collections?: number; new_leads?: number; problems?: string; market_feedback?: string }) {
+    return getDb().prepare('INSERT OR REPLACE INTO daily_reports (sales_rep_id, report_date, territory, shops_planned, shops_visited, orders_count, new_retailers, total_sales, total_collections, new_leads, problems, market_feedback) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').run(
+      data.sales_rep_id, data.report_date, data.territory || '', data.shops_planned || 0, data.shops_visited || 0, data.orders_count || 0, data.new_retailers || 0, data.total_sales || 0, data.total_collections || 0, data.new_leads || 0, data.problems || '', data.market_feedback || ''
+    );
+  },
+
+  // ─── Discount Approvals ───
+  getDiscountApprovals(status?: string) {
+    let query = 'SELECT da.*, so.order_number, so.total, sr.full_name as rep_name, sr.employee_code as rep_code FROM discount_approvals da JOIN sales_orders so ON da.sales_order_id = so.id JOIN sales_reps sr ON da.sales_rep_id = sr.id';
+    if (status) { query += ' WHERE da.status = ?'; }
+    query += ' ORDER BY da.created_at DESC';
+    return status ? getDb().prepare(query).all(status) : getDb().prepare(query).all();
+  },
+
+  // ─── Sales Analytics (aggregated) ───
+  getSalesAnalytics() {
+    const todaySales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE status NOT IN ('cancelled', 'rejected') AND date(created_at) = date('now')").get() as any)?.total || 0;
+    const monthlySales = (getDb().prepare("SELECT COALESCE(SUM(total), 0) as total FROM sales_orders WHERE status NOT IN ('cancelled', 'rejected') AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')").get() as any)?.total || 0;
+    const monthlyCollections = (getDb().prepare("SELECT COALESCE(SUM(amount), 0) as total FROM collections WHERE strftime('%Y-%m', collected_at) = strftime('%Y-%m', 'now')").get() as any)?.total || 0;
+    const totalOutstanding = (getDb().prepare("SELECT COALESCE(SUM(outstanding_balance), 0) as total FROM retailers WHERE status = 'active'").get() as any)?.total || 0;
+    const activeReps = (getDb().prepare("SELECT COUNT(*) as count FROM sales_reps WHERE status = 'active'").get() as any)?.count || 0;
+    const activeRetailers = (getDb().prepare("SELECT COUNT(*) as count FROM retailers WHERE status = 'active'").get() as any)?.count || 0;
+    const newRetailersThisMonth = (getDb().prepare("SELECT COUNT(*) as count FROM retailers WHERE strftime('%Y-%m', registered_at) = strftime('%Y-%m', 'now')").get() as any)?.count || 0;
+    return { todaySales, monthlySales, monthlyCollections, totalOutstanding, activeReps, activeRetailers, newRetailersThisMonth };
   }
 };

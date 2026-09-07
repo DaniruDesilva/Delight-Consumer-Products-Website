@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, FileText, Newspaper, Briefcase, ClipboardList, Image, ShoppingCart, Users, MessageCircle, Settings, LogOut, ChevronLeft, Menu, RefreshCcw, Tag, BarChart3, FolderTree } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, Newspaper, Briefcase, ClipboardList, Image, ShoppingCart, Users, MessageCircle, Settings, LogOut, ChevronLeft, Menu, RefreshCcw, Tag, BarChart3, FolderTree, DollarSign } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 const ALL_NAV_ITEMS = [
@@ -25,6 +25,17 @@ const ALL_NAV_ITEMS = [
   { href: '/admin/faq', icon: MessageCircle, label: 'FAQs', permission: 'manage_content' },
   { href: '/admin/customers', icon: Users, label: 'Customers', permission: 'manage_customers' },
   { href: '/admin/questions', icon: MessageCircle, label: 'Questions', permission: 'manage_customers' },
+  // ─── Sales Management ───
+  { href: '/admin/sales-reps', icon: Users, label: 'Sales Reps', permission: 'manage_sales' },
+  { href: '/admin/retailers', icon: Briefcase, label: 'Retailers', permission: 'manage_sales' },
+  { href: '/admin/sales-orders', icon: ShoppingCart, label: 'Sales Orders', permission: 'manage_sales' },
+  { href: '/admin/collections', icon: DollarSign, label: 'Collections', permission: 'manage_sales' },
+  { href: '/admin/targets', icon: BarChart3, label: 'Sales Targets', permission: 'manage_sales' },
+  { href: '/admin/commissions', icon: DollarSign, label: 'Commissions', permission: 'manage_sales' },
+  { href: '/admin/daily-reports', icon: ClipboardList, label: 'Daily Reports', permission: 'manage_sales' },
+  { href: '/admin/discount-approvals', icon: Tag, label: 'Discount Approvals', permission: 'manage_sales' },
+  { href: '/admin/sales-analytics', icon: BarChart3, label: 'Sales Analytics', permission: 'manage_sales' },
+  // ─── System ───
   { href: '/admin/staff', icon: Users, label: 'Staff', permission: 'super_admin' },
   { href: '/admin/settings', icon: Settings, label: 'Settings', permission: 'manage_settings' },
 ];
