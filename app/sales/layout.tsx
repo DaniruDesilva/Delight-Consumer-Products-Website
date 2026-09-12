@@ -23,8 +23,8 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
     fetch('/api/auth/sales/me')
       .then(res => res.json())
       .then(data => {
-        if (data.sales_rep) {
-          setSalesRep(data.sales_rep);
+        if (data.salesRep) {
+          setSalesRep(data.salesRep);
           setIsAuthed(true);
         } else {
           router.replace('/sales/login');
@@ -68,7 +68,7 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
           <button 
             onClick={() => setIsSidebarOpen(true)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            className="lg:hidden"
+            className="mobileMenuBtn"
           >
             <Menu size={24} color="#0f172a" />
           </button>
@@ -76,7 +76,7 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
-                {salesRep?.name || 'Sales Rep'}
+                {salesRep?.full_name || 'Sales Rep'}
               </div>
               <div style={{ fontSize: '12px', color: '#64748b' }}>
                 {salesRep?.territory || 'Unassigned Territory'}
@@ -93,7 +93,7 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
               fontWeight: 600,
               color: '#334155'
             }}>
-              {salesRep?.name ? salesRep.name.charAt(0).toUpperCase() : 'S'}
+              {salesRep?.full_name ? salesRep.full_name.charAt(0).toUpperCase() : 'S'}
             </div>
           </div>
         </header>
@@ -106,9 +106,9 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
       <style jsx>{`
         @media (min-width: 1024px) {
           main {
-            marginLeft: 260px !important;
+            margin-left: 260px !important;
           }
-          .lg\\:hidden {
+          .mobileMenuBtn {
             display: none !important;
           }
         }

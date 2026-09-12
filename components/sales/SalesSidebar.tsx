@@ -11,7 +11,8 @@ import {
   LogOut,
   MapPin,
   ClipboardList,
-  History
+  History,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './SalesSidebar.module.css';
@@ -58,12 +59,21 @@ export default function SalesSidebar({
             priority
             style={{ objectFit: 'contain' }}
           />
+          <button 
+            className={styles.closeBtn} 
+            onClick={() => setIsOpen(false)}
+            aria-label="Close menu"
+          >
+            <X size={24} />
+          </button>
         </div>
         
         <nav className={styles.nav}>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActive = item.href === '/sales' 
+              ? pathname === '/sales' 
+              : (pathname === item.href || pathname.startsWith(`${item.href}/`));
             return (
               <Link 
                 key={item.href} 

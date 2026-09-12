@@ -38,7 +38,7 @@ export default function SalesDashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
         <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
-          Welcome back, {data?.sales_rep?.name?.split(' ')[0] || 'Sales Rep'}!
+          Welcome back, {data?.salesRep?.full_name?.split(' ')[0] || 'Sales Rep'}!
         </h1>
         <p style={{ color: '#64748b', margin: 0 }}>
           Here's an overview of your territory and performance.

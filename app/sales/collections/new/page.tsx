@@ -85,12 +85,12 @@ export default function RecordCollectionPage() {
             <select required name="retailer_id" value={formData.retailer_id} onChange={handleChange} style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '15px', background: 'white' }}>
               <option value="">-- Choose Retailer --</option>
               {retailers.map(r => (
-                <option key={r.id} value={r.id}>{r.business_name} ({r.city})</option>
+                <option key={r.id} value={r.id}>{r.shop_name} ({r.city})</option>
               ))}
             </select>
             {selectedRetailerData && (
               <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
-                Outstanding Balance: <strong style={{ color: selectedRetailerData.outstanding_amount > 0 ? '#ef4444' : '#10b981' }}>LKR {selectedRetailerData.outstanding_amount.toLocaleString()}</strong>
+                Outstanding Balance: <strong style={{ color: selectedRetailerData.outstanding_balance > 0 ? '#ef4444' : '#10b981' }}>LKR {selectedRetailerData.outstanding_balance.toLocaleString()}</strong>
               </div>
             )}
           </div>

@@ -3,13 +3,20 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Search, FileText } from 'lucide-react';
+import ConfirmModal from '@/components/shared/ConfirmModal';
 
 export default function SalesOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; orderId: number | null; currentStatus: string; newStatus: string }>({
+    isOpen: false,
+    orderId: null,
+    currentStatus: '',
+    newStatus: ''
+  });
 
-  useEffect(() => {
+  const loadOrders = () => {
     fetch('/api/sales/orders')
       .then(r => r.json())
       .then(data => {
@@ -17,11 +24,40 @@ export default function SalesOrdersPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadOrders();
   }, []);
+
+  const handleStatusSelect = (id: number, currentStatus: string, newStatus: string) => {
+    setConfirmModal({ isOpen: true, orderId: id, currentStatus, newStatus });
+  };
+
+  const confirmUpdateStatus = async () => {
+    const { orderId, newStatus } = confirmModal;
+    if (!orderId) return;
+
+    await fetch(`/api/sales/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    
+    setConfirmModal({ isOpen: false, orderId: null, currentStatus: '', newStatus: '' });
+    loadOrders();
+  };
+
+  const getAvailableStatuses = (currentStatus: string) => {
+    if (currentStatus === 'ready') return ['ready', 'delivered'];
+    if (currentStatus === 'delivered') return ['ready', 'delivered', 'cash_collected'];
+    if (currentStatus === 'cash_collected') return ['delivered', 'cash_collected'];
+    return [currentStatus]; // fallback for pending, cancelled, etc where rep can't edit
+  };
 
   const filtered = orders.filter(o => 
     o.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    o.retailer_name.toLowerCase().includes(searchTerm.toLowerCase())
+    (o.retailer_name && o.retailer_name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -89,16 +125,45 @@ export default function SalesOrdersPage() {
                       {order.total.toLocaleString()}
                     </td>
                     <td style={{ padding: '16px' }}>
-                      <span style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        fontSize: '12px', 
-                        fontWeight: 500,
-                        background: order.status === 'completed' || order.status === 'delivered' ? '#ecfdf5' : order.status === 'pending_approval' ? '#fefce8' : order.status === 'rejected' ? '#fef2f2' : '#eff6ff',
-                        color: order.status === 'completed' || order.status === 'delivered' ? '#10b981' : order.status === 'pending_approval' ? '#ca8a04' : order.status === 'rejected' ? '#ef4444' : '#2563eb'
-                      }}>
-                        {order.status.replace('_', ' ').toUpperCase()}
-                      </span>
+                      {(() => {
+                        const available = getAvailableStatuses(order.status);
+                        const formatStatus = (s: string) => s.replace('_', ' ').toUpperCase();
+                        
+                        if (available.length > 1) {
+                          return (
+                            <select
+                              value={order.status}
+                              onChange={e => handleStatusSelect(order.id, order.status, e.target.value)}
+                              style={{ 
+                                padding: '6px 10px', 
+                                borderRadius: 8, 
+                                border: '1px solid #e5e7eb', 
+                                fontSize: 12, 
+                                fontWeight: 600, 
+                                background: '#f9fafb', 
+                                cursor: 'pointer' 
+                              }}
+                            >
+                              {available.map(s => (
+                                <option key={s} value={s}>{formatStatus(s)}</option>
+                              ))}
+                            </select>
+                          );
+                        }
+                        
+                        return (
+                          <span style={{ 
+                            padding: '4px 8px', 
+                            borderRadius: '4px', 
+                            fontSize: '12px', 
+                            fontWeight: 500,
+                            background: order.status === 'completed' || order.status === 'delivered' || order.status === 'cash_collected' ? '#ecfdf5' : order.status === 'pending_approval' ? '#fefce8' : order.status === 'rejected' ? '#fef2f2' : '#eff6ff',
+                            color: order.status === 'completed' || order.status === 'delivered' || order.status === 'cash_collected' ? '#10b981' : order.status === 'pending_approval' ? '#ca8a04' : order.status === 'rejected' ? '#ef4444' : '#2563eb'
+                          }}>
+                            {formatStatus(order.status)}
+                          </span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))}
@@ -107,6 +172,19 @@ export default function SalesOrdersPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Update Order Status"
+        message={`Are you sure you want to change the order status to ${confirmModal.newStatus.replace('_', ' ').toUpperCase()}?`}
+        confirmText="Yes, update status"
+        cancelText="Cancel"
+        onConfirm={confirmUpdateStatus}
+        onCancel={() => {
+          setConfirmModal({ isOpen: false, orderId: null, currentStatus: '', newStatus: '' });
+          loadOrders(); // Reset dropdown visually
+        }}
+      />
     </div>
   );
 }

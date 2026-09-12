@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Upload, X, ImagePlus } from 'lucide-react';
+import { ArrowLeft, Upload, X, ImagePlus, Plus, Trash2 } from 'lucide-react';
 import styles from '../../shared.module.css';
 
 export default function EditProductPage() {
@@ -13,11 +13,12 @@ export default function EditProductPage() {
   const id = params.id as string;
   const [form, setForm] = useState({
     name: '', description: '', short_description: '', long_description: '', key_features: '',
-    price: '', original_price: '',
+    price: '', original_price: '', retailer_price: '', pack_size: '1',
     image: 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477142/delight_static/l3phgjchpgvmuxhdakp2.png', category: 'Incense', stock: '0',
     weight: '1', weight_unit: 'kg', min_order_quantity: '1',
-    is_featured: false, is_sale: false, status: 'active',
+    is_featured: false, is_sale: false, status: 'active', commission_eligible: true
   });
+  const [bulkTiers, setBulkTiers] = useState<{min_qty: string, price: string}[]>([]);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -29,17 +30,33 @@ export default function EditProductPage() {
     fetch('/api/admin/categories').then(r => r.json()).then(d => setCategories(d.categories || ['Incense', 'Perfume']));
     fetch(`/api/admin/products/${id}`, { cache: 'no-store' }).then(r => r.json()).then(p => {
       if (p.error) return;
+      
+      let parsedTiers = [];
+      try {
+        if (p.bulk_pricing_json) {
+          parsedTiers = JSON.parse(p.bulk_pricing_json).map((t: any) => ({
+            min_qty: String(t.min_qty),
+            price: String(t.price)
+          }));
+        }
+      } catch (e) { console.error('Failed to parse bulk pricing', e); }
+
       setForm({
         name: p.name || '', description: p.description || '',
         short_description: p.short_description || '', long_description: p.long_description || '',
         key_features: p.key_features || '',
         price: String(p.price || ''), original_price: p.original_price ? String(p.original_price) : '',
+        retailer_price: p.retailer_price ? String(p.retailer_price) : '',
+        pack_size: String(p.pack_size || 1),
         image: p.image || 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477142/delight_static/l3phgjchpgvmuxhdakp2.png', category: p.category || 'Incense',
         stock: String(p.stock || 0), weight: String(p.weight ?? 1), weight_unit: p.weight_unit || 'kg',
         min_order_quantity: String(p.min_order_quantity ?? 1),
         is_featured: p.is_featured === 1,
         is_sale: p.is_sale === 1, status: p.status || 'active',
+        commission_eligible: p.commission_eligible !== 0
       });
+      setBulkTiers(parsedTiers);
+      
       // Load gallery images
       if (p.gallery_images && Array.isArray(p.gallery_images)) {
         setGalleryImages(p.gallery_images.map((img: { image_url: string } | string) =>
@@ -80,9 +97,23 @@ export default function EditProductPage() {
     setUploading(false);
   };
 
+  const addBulkTier = () => setBulkTiers([...bulkTiers, { min_qty: '10', price: '' }]);
+  const updateBulkTier = (index: number, field: string, value: string) => {
+    const newTiers = [...bulkTiers];
+    newTiers[index] = { ...newTiers[index], [field]: value };
+    setBulkTiers(newTiers);
+  };
+  const removeBulkTier = (index: number) => setBulkTiers(bulkTiers.filter((_, i) => i !== index));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+
+    const validTiers = bulkTiers
+      .filter(t => t.min_qty && t.price)
+      .map(t => ({ min_qty: parseInt(t.min_qty), price: parseFloat(t.price) }))
+      .sort((a, b) => a.min_qty - b.min_qty);
+
     const res = await fetch(`/api/admin/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -90,6 +121,9 @@ export default function EditProductPage() {
         ...form,
         price: parseFloat(form.price),
         original_price: form.original_price ? parseFloat(form.original_price) : null,
+        retailer_price: form.retailer_price ? parseFloat(form.retailer_price) : null,
+        pack_size: parseInt(form.pack_size) || 1,
+        bulk_pricing_json: JSON.stringify(validTiers),
         stock: parseInt(form.stock),
         weight: parseFloat(form.weight) || 1,
         weight_unit: form.weight_unit,
@@ -133,7 +167,7 @@ export default function EditProductPage() {
                     <input name="short_description" value={form.short_description} onChange={handleChange} placeholder="Brief one-line summary..." />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Price (Rs.) *</label>
+                    <label>Retail Price (Rs.) *</label>
                     <input name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
                   </div>
                   <div className={styles.formGroup}>
@@ -164,6 +198,42 @@ export default function EditProductPage() {
                     <label>Minimum Order Quantity (MOQ)</label>
                     <input name="min_order_quantity" type="number" value={form.min_order_quantity} onChange={handleChange} min="1" placeholder="1" required />
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.card} style={{ marginBottom: 20 }}>
+              <div className={styles.cardHeader}><h2>B2B Wholesale / Packs</h2></div>
+              <div className={styles.cardBody}>
+                <div className={styles.formGrid}>
+                  <div className={styles.formGroup}>
+                    <label>Pack Size (Items per pack) *</label>
+                    <input name="pack_size" type="number" value={form.pack_size} onChange={handleChange} min="1" required />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Base Retailer Price / Pack (Rs.)</label>
+                    <input name="retailer_price" type="number" step="0.01" value={form.retailer_price} onChange={handleChange} placeholder="0.00" />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 24 }}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 600 }}>Tiered Bulk Pricing</label>
+                  {bulkTiers.map((tier, index) => (
+                    <div key={index} style={{ display: 'flex', gap: 12, marginBottom: 12, alignItems: 'center' }}>
+                      <div style={{ flex: 1 }}>
+                        <input type="number" placeholder="Min Quantity" value={tier.min_qty} onChange={e => updateBulkTier(index, 'min_qty', e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 6 }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <input type="number" step="0.01" placeholder="Price per Pack" value={tier.price} onChange={e => updateBulkTier(index, 'price', e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 6 }} />
+                      </div>
+                      <button type="button" onClick={() => removeBulkTier(index)} style={{ padding: 8, color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={addBulkTier} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, color: '#2563eb', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 0' }}>
+                    <Plus size={16} /> Add Pricing Tier
+                  </button>
                 </div>
               </div>
             </div>
@@ -234,6 +304,10 @@ export default function EditProductPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <span style={{ fontSize: 14, fontWeight: 500 }}>On Sale</span>
                   <button type="button" className={`${styles.toggle} ${form.is_sale ? styles.active : ''}`} onClick={() => setForm(prev => ({ ...prev, is_sale: !prev.is_sale }))} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>Commission Eligible</span>
+                  <button type="button" className={`${styles.toggle} ${form.commission_eligible ? styles.active : ''}`} onClick={() => setForm(prev => ({ ...prev, commission_eligible: !prev.commission_eligible }))} />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Status</label>

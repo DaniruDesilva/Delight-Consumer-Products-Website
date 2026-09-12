@@ -12,9 +12,10 @@ export async function GET() {
     const products = db.instance.prepare(`
       SELECT 
         id, name, slug, price, retailer_price, category, 
-        stock, is_active, sku, commission_eligible 
+        stock, status, sku, commission_eligible,
+        pack_size, bulk_pricing_json
       FROM products 
-      WHERE is_active = 1 
+      WHERE status = 'active' 
       ORDER BY category ASC, name ASC
     `).all();
 

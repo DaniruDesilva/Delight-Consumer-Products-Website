@@ -21,7 +21,7 @@ export default function TargetsAndCommissionsPage() {
     return <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Loading your performance data...</div>;
   }
 
-  const { target, stats, commissionTiers, estimatedCommission, currentTier, nextTier, commissionHistory } = data;
+  const { target, stats, commissionTiers = [], estimatedCommission = 0, currentTier, nextTier, commissionHistory = [] } = data || {};
 
   const targetAmount = target?.target_amount || 0;
   const achievedSales = stats?.monthlySales || 0;
@@ -82,7 +82,7 @@ export default function TargetsAndCommissionsPage() {
           </div>
           
           <div style={{ fontSize: '32px', fontWeight: 700, color: '#10b981', marginBottom: '8px' }}>
-            LKR {estimatedCommission.toLocaleString()}
+            LKR {(estimatedCommission || 0).toLocaleString()}
           </div>
 
           {currentTier ? (

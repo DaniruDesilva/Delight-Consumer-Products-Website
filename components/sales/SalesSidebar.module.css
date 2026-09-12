@@ -23,6 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .nav {
@@ -97,11 +98,32 @@
   pointer-events: auto;
 }
 
+.closeBtn {
+  position: absolute;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: #64748b;
+}
+
+.closeBtn:hover {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
 @media (min-width: 1024px) {
   .collapsed {
     transform: translateX(0);
   }
   .overlay {
+    display: none;
+  }
+  .closeBtn {
     display: none;
   }
 }

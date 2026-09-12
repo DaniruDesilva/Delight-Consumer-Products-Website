@@ -188,6 +188,8 @@ function initTables(db: Database.Database) {
       is_featured INTEGER DEFAULT 0,
       is_sale INTEGER DEFAULT 0,
       status TEXT DEFAULT 'active',
+      pack_size INTEGER DEFAULT 1,
+      bulk_pricing_json TEXT DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -621,6 +623,8 @@ function initTables(db: Database.Database) {
   try { db.exec('ALTER TABLE products ADD COLUMN cost_price REAL DEFAULT NULL'); } catch {}
   try { db.exec('ALTER TABLE products ADD COLUMN retailer_price REAL DEFAULT NULL'); } catch {}
   try { db.exec('ALTER TABLE products ADD COLUMN commission_eligible INTEGER DEFAULT 1'); } catch {}
+  try { db.exec('ALTER TABLE products ADD COLUMN pack_size INTEGER DEFAULT 1'); } catch {}
+  try { db.exec('ALTER TABLE products ADD COLUMN bulk_pricing_json TEXT DEFAULT "[]"'); } catch {}
   try { db.exec('ALTER TABLE orders ADD COLUMN shipping_zip TEXT DEFAULT ""'); } catch {}
 
   // Seed default admin if none exists
@@ -882,8 +886,8 @@ export const db = {
     // Ensure uniqueness
     const existing = getDb().prepare('SELECT id FROM products WHERE slug = ?').get(slug);
     if (existing) slug = `${slug}-${Date.now()}`;
-    const stmt = getDb().prepare(`INSERT INTO products (name, description, short_description, long_description, key_features, price, original_price, image, category, stock, is_featured, is_sale, status, slug, weight, weight_unit, min_order_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-    return stmt.run(nameStr, data.description || '', data.short_description || '', data.long_description || '', data.key_features || '', data.price, data.original_price || null, data.image || 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477016/delight_products/mw9mdhwkm2xmtlwlhme9.jpg', data.category || 'Uncategorized', data.stock || 0, data.is_featured ? 1 : 0, data.is_sale ? 1 : 0, data.status || 'active', slug, data.weight || 1, data.weight_unit || 'kg', data.min_order_quantity !== undefined ? data.min_order_quantity : 1);
+    const stmt = getDb().prepare(`INSERT INTO products (name, description, short_description, long_description, key_features, price, original_price, image, category, stock, is_featured, is_sale, status, slug, weight, weight_unit, min_order_quantity, sku, cost_price, retailer_price, commission_eligible, pack_size, bulk_pricing_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    return stmt.run(nameStr, data.description || '', data.short_description || '', data.long_description || '', data.key_features || '', data.price, data.original_price || null, data.image || 'https://res.cloudinary.com/dbvmfmob4/image/upload/v1779477016/delight_products/mw9mdhwkm2xmtlwlhme9.jpg', data.category || 'Uncategorized', data.stock || 0, data.is_featured ? 1 : 0, data.is_sale ? 1 : 0, data.status || 'active', slug, data.weight || 1, data.weight_unit || 'kg', data.min_order_quantity !== undefined ? data.min_order_quantity : 1, data.sku || null, data.cost_price || null, data.retailer_price || null, data.commission_eligible ? 1 : 0, data.pack_size || 1, data.bulk_pricing_json || '[]');
   },
 
   updateProduct(id: number, data: Record<string, unknown>) {
@@ -894,8 +898,8 @@ export const db = {
       const cur = getDb().prepare('SELECT slug FROM products WHERE id = ?').get(id) as { slug: string | null } | undefined;
       slug = cur?.slug || toSlug(nameStr) || `product-${id}`;
     }
-    const stmt = getDb().prepare(`UPDATE products SET name=?, description=?, short_description=?, long_description=?, key_features=?, price=?, original_price=?, image=?, category=?, stock=?, is_featured=?, is_sale=?, status=?, slug=?, weight=?, weight_unit=?, min_order_quantity=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`);
-    return stmt.run(nameStr, data.description || '', data.short_description || '', data.long_description || '', data.key_features || '', data.price, data.original_price || null, data.image, data.category, data.stock, data.is_featured ? 1 : 0, data.is_sale ? 1 : 0, data.status, slug, data.weight !== undefined ? data.weight : 1, data.weight_unit || 'kg', data.min_order_quantity !== undefined ? data.min_order_quantity : 1, id);
+    const stmt = getDb().prepare(`UPDATE products SET name=?, description=?, short_description=?, long_description=?, key_features=?, price=?, original_price=?, image=?, category=?, stock=?, is_featured=?, is_sale=?, status=?, slug=?, weight=?, weight_unit=?, min_order_quantity=?, sku=?, cost_price=?, retailer_price=?, commission_eligible=?, pack_size=?, bulk_pricing_json=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`);
+    return stmt.run(nameStr, data.description || '', data.short_description || '', data.long_description || '', data.key_features || '', data.price, data.original_price || null, data.image, data.category, data.stock, data.is_featured ? 1 : 0, data.is_sale ? 1 : 0, data.status, slug, data.weight !== undefined ? data.weight : 1, data.weight_unit || 'kg', data.min_order_quantity !== undefined ? data.min_order_quantity : 1, data.sku || null, data.cost_price || null, data.retailer_price || null, data.commission_eligible ? 1 : 0, data.pack_size || 1, data.bulk_pricing_json || '[]', id);
   },
 
   deleteProduct(id: number) {
@@ -1715,6 +1719,37 @@ export const db = {
     if (status) { query += ' WHERE da.status = ?'; }
     query += ' ORDER BY da.created_at DESC';
     return status ? getDb().prepare(query).all(status) : getDb().prepare(query).all();
+  },
+
+  // ─── Visits ───
+  getVisitsByDate(sales_rep_id: number, date: string) {
+    const query = `
+      SELECT v.*, r.shop_name, r.city, r.address, r.phone, r.outstanding_balance 
+      FROM visits v 
+      JOIN retailers r ON v.retailer_id = r.id 
+      WHERE v.sales_rep_id = ? AND v.planned_date = ?
+      ORDER BY v.status DESC, v.created_at ASC
+    `;
+    return getDb().prepare(query).all(sales_rep_id, date);
+  },
+
+  createVisit(sales_rep_id: number, retailer_id: number, planned_date: string) {
+    return getDb().prepare('INSERT INTO visits (sales_rep_id, retailer_id, planned_date) VALUES (?,?,?)').run(sales_rep_id, retailer_id, planned_date);
+  },
+
+  updateVisitStatus(id: number, status: string, check_in_time?: string, check_out_time?: string, notes?: string) {
+    let query = 'UPDATE visits SET status = ?';
+    const params: any[] = [status];
+    if (check_in_time) { query += ', check_in_time = ?'; params.push(check_in_time); }
+    if (check_out_time) { query += ', check_out_time = ?'; params.push(check_out_time); }
+    if (notes) { query += ', notes = ?'; params.push(notes); }
+    query += ' WHERE id = ?';
+    params.push(id);
+    return getDb().prepare(query).run(...params);
+  },
+
+  deleteVisit(id: number) {
+    return getDb().prepare('DELETE FROM visits WHERE id = ?').run(id);
   },
 
   // ─── Sales Analytics (aggregated) ───

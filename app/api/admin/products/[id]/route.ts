@@ -35,7 +35,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error('Failed to update product:', err);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }

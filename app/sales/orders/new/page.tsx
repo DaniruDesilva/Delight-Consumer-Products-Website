@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Plus, Minus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function CreateOrderPage() {
   const router = useRouter();
@@ -13,6 +12,7 @@ export default function CreateOrderPage() {
 
   const [retailers, setRetailers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   
   const [selectedRetailer, setSelectedRetailer] = useState('');
   const [cart, setCart] = useState<any[]>([]);
@@ -26,31 +26,56 @@ export default function CreateOrderPage() {
       .then(d => { if (d.retailers) setRetailers(d.retailers); });
       
     // Fetch products
+    setProductsLoading(true);
     fetch('/api/sales/products')
       .then(r => r.json())
-      .then(d => { if (d.products) setProducts(d.products); });
+      .then(d => { 
+        if (d.products) setProducts(d.products); 
+        setProductsLoading(false);
+      })
+      .catch(() => setProductsLoading(false));
   }, []);
+
+  const getPriceForQuantity = (product: any, quantity: number) => {
+    let basePrice = product.retailer_price || product.price;
+    try {
+      if (product.bulk_pricing_json) {
+        const tiers = JSON.parse(product.bulk_pricing_json).sort((a: any, b: any) => b.min_qty - a.min_qty); // descending
+        for (const tier of tiers) {
+          if (quantity >= tier.min_qty) {
+            return tier.price;
+          }
+        }
+      }
+    } catch (e) {}
+    return basePrice;
+  };
 
   const addToCart = (product: any) => {
     const existing = cart.find(item => item.product_id === product.id);
     if (existing) {
-      setCart(cart.map(item => item.product_id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
+      const newQty = existing.quantity + 1;
+      const newPrice = getPriceForQuantity(product, newQty);
+      setCart(cart.map(item => item.product_id === product.id ? { ...item, quantity: newQty, price: newPrice } : item));
     } else {
       setCart([...cart, { 
         product_id: product.id, 
-        name: product.name, 
-        price: product.retailer_price || product.price, 
+        name: product.name,
+        pack_size: product.pack_size || 1,
+        original_product: product,
+        price: getPriceForQuantity(product, 1), 
         quantity: 1,
         sku: product.sku
       }]);
     }
   };
 
-  const updateQuantity = (productId: number, delta: number) => {
+  const updateQuantity = (productId: number, newQty: number) => {
+    const qty = Math.max(1, isNaN(newQty) ? 1 : newQty);
     setCart(cart.map(item => {
       if (item.product_id === productId) {
-        const newQ = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQ };
+        const newPrice = getPriceForQuantity(item.original_product, qty);
+        return { ...item, quantity: qty, price: newPrice };
       }
       return item;
     }));
@@ -110,7 +135,7 @@ export default function CreateOrderPage() {
         </Link>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>Create Sales Order</h1>
-          <p style={{ color: '#64748b', margin: 0 }}>Draft a new B2B order for a retailer.</p>
+          <p style={{ color: '#64748b', margin: 0 }}>Draft a new wholesale B2B order for a retailer.</p>
         </div>
       </div>
 
@@ -120,9 +145,9 @@ export default function CreateOrderPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', alignItems: 'start' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'flex-start' }}>
         {/* Left Column: Retailer & Products */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Retailer Selection */}
           <div style={{ background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
@@ -134,38 +159,47 @@ export default function CreateOrderPage() {
             >
               <option value="">-- Choose Retailer --</option>
               {retailers.map(r => (
-                <option key={r.id} value={r.id}>{r.business_name} ({r.city})</option>
+                <option key={r.id} value={r.id}>{r.shop_name} ({r.city})</option>
               ))}
             </select>
           </div>
 
           {/* Product Selection */}
           <div style={{ background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: '0 0 16px 0' }}>2. Add Products</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: '0 0 16px 0' }}>2. Add Products (Wholesale Packs)</h2>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-              {products.map(p => (
-                <div key={p.id} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'pointer', transition: 'border 0.2s' }} onClick={() => addToCart(p)}>
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginBottom: '4px' }}>{p.sku}</div>
-                    <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>{p.name}</h3>
+            {productsLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', gap: '12px', color: '#64748b' }}>
+                <Loader2 size={24} className="spin" />
+                <span>Loading products...</span>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                {products.map(p => (
+                  <div key={p.id} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'pointer', transition: 'border 0.2s', background: 'white' }} onClick={() => addToCart(p)}>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginBottom: '4px' }}>
+                        {p.sku ? `${p.sku} • ` : ''}Pack of {p.pack_size || 1}
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#0f172a', lineHeight: '1.4' }}>{p.name}</h3>
+                    </div>
+                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb' }}>
+                        LKR {(p.retailer_price || p.price).toLocaleString()}
+                      </span>
+                      <button style={{ background: '#eff6ff', border: 'none', width: '28px', height: '28px', borderRadius: '6px', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <Plus size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb' }}>
-                      LKR {(p.retailer_price || p.price).toLocaleString()}
-                    </span>
-                    <button style={{ background: '#eff6ff', border: 'none', width: '28px', height: '28px', borderRadius: '6px', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right Column: Cart & Summary */}
-        <div style={{ background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: '100px' }}>
+        <div style={{ flex: '1 1 320px', background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: '100px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: '0 0 16px 0' }}>Order Summary</h2>
           
           {cart.length === 0 ? (
@@ -177,18 +211,29 @@ export default function CreateOrderPage() {
               {cart.map(item => (
                 <div key={item.product_id} style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{item.name}</span>
+                    <div>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a', display: 'block' }}>{item.name}</span>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>Pack of {item.pack_size}</span>
+                    </div>
                     <button onClick={() => removeFromCart(item.product_id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '4px' }}>
-                      <button onClick={() => updateQuantity(item.product_id, -1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: '#64748b' }}><Minus size={14} /></button>
-                      <span style={{ fontSize: '14px', fontWeight: 500, minWidth: '24px', textAlign: 'center' }}>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.product_id, 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: '#64748b' }}><Plus size={14} /></button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>Qty:</span>
+                      <input 
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) => updateQuantity(item.product_id, parseInt(e.target.value))}
+                        style={{ width: '60px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontSize: '14px' }}
+                      />
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
-                      LKR {(item.price * item.quantity).toLocaleString()}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
+                        LKR {(item.price * item.quantity).toLocaleString()}
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#10b981' }}>{item.price.toLocaleString()} / pack</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -257,6 +302,10 @@ export default function CreateOrderPage() {
           </div>
         </div>
       </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}} />
     </div>
   );
 }

@@ -12,7 +12,7 @@ export async function GET() {
     const retailers = db.instance.prepare(`
       SELECT * FROM retailers 
       WHERE sales_rep_id = ? 
-      ORDER BY created_at DESC
+      ORDER BY registered_at DESC
     `).all(session.sales_rep_id);
 
     return NextResponse.json({ retailers });
@@ -47,23 +47,22 @@ export async function POST(request: Request) {
 
     const stmt = db.instance.prepare(`
       INSERT INTO retailers (
-        sales_rep_id, business_name, owner_name, contact_number, email, 
-        address, city, district, location_lat, location_lng, 
-        credit_limit, current_balance, outstanding_amount, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 'active')
+        sales_rep_id, shop_name, owner_name, phone, email, address, city, district, 
+        gps_lat, gps_lng, credit_limit, outstanding_balance, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'active')
     `);
 
     const result = stmt.run(
       session.sales_rep_id,
-      business_name,
+      business_name, // maps to shop_name
       owner_name,
-      contact_number,
+      contact_number, // maps to phone
       email || null,
       address,
       city,
       district,
-      location_lat || null,
-      location_lng || null
+      location_lat || null, // maps to gps_lat
+      location_lng || null  // maps to gps_lng
     );
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });

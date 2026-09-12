@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Search, MapPin, Phone } from 'lucide-react';
+import { Plus, Search, MapPin, Phone, Mail, Edit } from 'lucide-react';
 
 export default function RetailersPage() {
   const [retailers, setRetailers] = useState<any[]>([]);
@@ -20,9 +20,9 @@ export default function RetailersPage() {
   }, []);
 
   const filtered = retailers.filter(r => 
-    r.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.contact_number.includes(searchTerm)
+    r.shop_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.phone?.includes(searchTerm)
   );
 
   return (
@@ -65,36 +65,49 @@ export default function RetailersPage() {
               <div key={retailer.id} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>{retailer.business_name}</h3>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>{retailer.shop_name}</h3>
                     <div style={{ fontSize: '13px', color: '#64748b' }}>{retailer.owner_name}</div>
                   </div>
-                  <span style={{ 
-                    padding: '4px 8px', 
-                    borderRadius: '4px', 
-                    fontSize: '12px', 
-                    fontWeight: 500,
-                    background: retailer.status === 'active' ? '#ecfdf5' : '#fef2f2',
-                    color: retailer.status === 'active' ? '#10b981' : '#ef4444'
-                  }}>
-                    {retailer.status}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '12px', 
+                      fontWeight: 500,
+                      background: retailer.status === 'active' ? '#ecfdf5' : '#fef2f2',
+                      color: retailer.status === 'active' ? '#10b981' : '#ef4444'
+                    }}>
+                      {retailer.status}
+                    </span>
+                    <Link href={`/sales/retailers/edit/${retailer.id}`} style={{ padding: '6px', color: '#64748b', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
+                      <Edit size={16} />
+                    </Link>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475569' }}>
                     <Phone size={16} color="#94a3b8" />
-                    {retailer.contact_number}
+                    {retailer.phone}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475569' }}>
-                    <MapPin size={16} color="#94a3b8" />
-                    {retailer.city}, {retailer.district}
+                  {retailer.email && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475569' }}>
+                      <Mail size={16} color="#94a3b8" />
+                      {retailer.email}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: '#475569' }}>
+                    <MapPin size={16} color="#94a3b8" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <span style={{ lineHeight: '1.4' }}>
+                      {retailer.address}, {retailer.city}, {retailer.district}
+                    </span>
                   </div>
                 </div>
 
                 <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <span style={{ color: '#64748b' }}>Balance:</span>
-                  <span style={{ fontWeight: 600, color: retailer.outstanding_amount > 0 ? '#ef4444' : '#10b981' }}>
-                    LKR {retailer.current_balance.toLocaleString()}
+                  <span style={{ fontWeight: 600, color: retailer.outstanding_balance > 0 ? '#ef4444' : '#10b981' }}>
+                    LKR {retailer.outstanding_balance.toLocaleString()}
                   </span>
                 </div>
               </div>
