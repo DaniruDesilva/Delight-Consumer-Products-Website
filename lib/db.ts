@@ -176,6 +176,21 @@ function initTables(db: Database.Database) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_rep_id INTEGER NOT NULL,
+      retailer_id INTEGER NOT NULL,
+      planned_date TEXT NOT NULL,
+      status TEXT DEFAULT 'planned',
+      check_in_time TEXT,
+      check_out_time TEXT,
+      notes TEXT,
+      is_admin_assigned INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(id),
+      FOREIGN KEY (retailer_id) REFERENCES retailers(id)
+    );
+
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -1733,8 +1748,8 @@ export const db = {
     return getDb().prepare(query).all(sales_rep_id, date);
   },
 
-  createVisit(sales_rep_id: number, retailer_id: number, planned_date: string) {
-    return getDb().prepare('INSERT INTO visits (sales_rep_id, retailer_id, planned_date) VALUES (?,?,?)').run(sales_rep_id, retailer_id, planned_date);
+  createVisit(sales_rep_id: number, retailer_id: number, planned_date: string, is_admin_assigned: number = 0) {
+    return getDb().prepare('INSERT INTO visits (sales_rep_id, retailer_id, planned_date, is_admin_assigned) VALUES (?,?,?,?)').run(sales_rep_id, retailer_id, planned_date, is_admin_assigned);
   },
 
   updateVisitStatus(id: number, status: string, check_in_time?: string, check_out_time?: string, notes?: string) {
@@ -1750,6 +1765,10 @@ export const db = {
 
   deleteVisit(id: number) {
     return getDb().prepare('DELETE FROM visits WHERE id = ?').run(id);
+  },
+
+  deleteVisitByRep(id: number, rep_id: number) {
+    return getDb().prepare('DELETE FROM visits WHERE id = ? AND sales_rep_id = ? AND is_admin_assigned = 0').run(id, rep_id);
   },
 
   // ─── Sales Analytics (aggregated) ───

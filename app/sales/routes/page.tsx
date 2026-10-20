@@ -3,23 +3,32 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, CheckCircle, Plus, Calendar as CalendarIcon, Store, Phone, X, RefreshCw } from 'lucide-react';
+import ConfirmModal from '@/components/shared/ConfirmModal';
 
 export default function RoutesDashboard() {
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; visitId: number | null }>({ isOpen: false, visitId: null });
 
   const fetchVisits = () => {
     setLoading(true);
     fetch(`/api/sales/routes?date=${date}`)
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || 'Failed to fetch routes');
+        }
+        return res.json();
+      })
       .then(data => {
         if (data.visits) setVisits(data.visits);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
+        setVisits([]); // Clear visits on error to prevent old data from sticking
         setLoading(false);
       });
   };
@@ -59,9 +68,15 @@ export default function RoutesDashboard() {
     }
   };
 
-  const handleDelete = async (visitId: number) => {
-    if (!confirm('Are you sure you want to remove this visit from your route?')) return;
+  const handleDeleteClick = (visitId: number) => {
+    setDeleteModal({ isOpen: true, visitId });
+  };
+
+  const confirmDelete = async () => {
+    const { visitId } = deleteModal;
+    if (!visitId) return;
     
+    setDeleteModal({ isOpen: false, visitId: null });
     setActionLoading(visitId);
     try {
       const res = await fetch(`/api/sales/routes/${visitId}`, {
@@ -138,6 +153,20 @@ export default function RoutesDashboard() {
                       </span>
                     )}
                   </div>
+                  {(visit.check_in_time || visit.check_out_time) && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#64748b', fontSize: '13px', marginTop: '6px' }}>
+                      {visit.check_in_time && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#2563eb' }}>
+                          <Clock size={12} /> In: {new Date(visit.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                      {visit.check_out_time && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10b981' }}>
+                          <Clock size={12} /> Out: {new Date(visit.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -170,7 +199,7 @@ export default function RoutesDashboard() {
 
                 {visit.status === 'planned' && (
                   <button 
-                    onClick={() => handleDelete(visit.id)}
+                    onClick={() => handleDeleteClick(visit.id)}
                     disabled={actionLoading === visit.id}
                     style={{ padding: '8px', borderRadius: '8px', background: '#fef2f2', color: '#ef4444', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                     title="Remove from Route"
@@ -184,6 +213,17 @@ export default function RoutesDashboard() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Remove Visit"
+        message="Are you sure you want to remove this retailer visit from your planned route?"
+        confirmText="Yes, remove it"
+        cancelText="Cancel"
+        isDestructive={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteModal({ isOpen: false, visitId: null })}
+      />
     </div>
   );
 }

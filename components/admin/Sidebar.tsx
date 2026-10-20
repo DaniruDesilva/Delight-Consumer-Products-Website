@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, FileText, Newspaper, Briefcase, ClipboardList, Image, ShoppingCart, Users, MessageCircle, Settings, LogOut, ChevronLeft, Menu, RefreshCcw, Tag, BarChart3, FolderTree, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, Newspaper, Briefcase, ClipboardList, Image, ShoppingCart, Users, MessageCircle, Settings, LogOut, ChevronLeft, Menu, RefreshCcw, Tag, BarChart3, FolderTree, DollarSign, MapPin } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 const ALL_NAV_ITEMS = [
@@ -28,6 +28,7 @@ const ALL_NAV_ITEMS = [
   // ─── Sales Management ───
   { href: '/admin/sales-reps', icon: Users, label: 'Sales Reps', permission: 'manage_sales' },
   { href: '/admin/retailers', icon: Briefcase, label: 'Retailers', permission: 'manage_sales' },
+  { href: '/admin/routes', icon: MapPin, label: 'Route Planning', permission: 'manage_sales' },
   { href: '/admin/sales-orders', icon: ShoppingCart, label: 'Sales Orders', permission: 'manage_sales' },
   { href: '/admin/collections', icon: DollarSign, label: 'Collections', permission: 'manage_sales' },
   { href: '/admin/targets', icon: BarChart3, label: 'Sales Targets', permission: 'manage_sales' },

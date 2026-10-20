@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getAuthAdmin } from '@/lib/auth';
-import db from '@/lib/db';
+import { getSalesRepSession } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const admin = await getAuthAdmin();
-  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getSalesRepSession();
+  if (!session || !session.sales_rep_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;
@@ -21,12 +21,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const admin = await getAuthAdmin();
-  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getSalesRepSession();
+  if (!session || !session.sales_rep_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;
-    db.deleteVisit(parseInt(id));
+    const result = db.deleteVisitByRep(parseInt(id), session.sales_rep_id);
+    
+    if (result.changes === 0) {
+      return NextResponse.json({ error: 'Cannot delete admin-assigned route or route not found' }, { status: 403 });
+    }
+    
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Error deleting visit:', error);
